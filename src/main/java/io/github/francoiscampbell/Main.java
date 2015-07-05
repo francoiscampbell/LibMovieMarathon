@@ -4,10 +4,12 @@ import io.github.francoiscampbell.api.MovieApi;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import io.github.francoiscampbell.apimodel.ApiShowtime;
 import io.github.francoiscampbell.model.Movie;
+import io.github.francoiscampbell.model.Schedule;
 import io.github.francoiscampbell.model.Showtime;
 import io.github.francoiscampbell.model.Theatre;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -21,6 +23,9 @@ import java.util.concurrent.CountDownLatch;
  */
 public class Main {
     private static final String API_URL = "http://data.tmsapi.com";
+    private static final String API_KM = "km";
+    private static final String API_MILES = "mi";
+    private static final String API_KEY = "xv4za7trkge9yrz4b4h6ws9s";
     private List<Theatre> theatres;
 
     public Main() {
@@ -31,10 +36,10 @@ public class Main {
             Theatre theatre = selectTheatre(theatres);
             List<Movie> movies = selectMovies(theatre);
 
-            List<Queue<Showtime>> schedule = new ArrayList<>();
+            List<Schedule> possibleSchedules = new ArrayList<>();
             Deque<Showtime> currentPermutation = new LinkedList<>();
-            generateSchedule(theatre, movies, new LocalDateTime(0), schedule, currentPermutation);
-            printSchedule(schedule);
+            generateSchedule(theatre, movies, new DateTime(0), possibleSchedules, currentPermutation);
+            printSchedules(possibleSchedules);
         } while (!quit());
     }
 
@@ -44,15 +49,18 @@ public class Main {
                                      .startsWith("q");
     }
 
-    private void printSchedule(List<Queue<Showtime>> schedule) {
-        System.out.println(schedule.size() + " schedules generated:");
+    private void printSchedules(List<Schedule> possibleSchedules) {
+        System.out.println(possibleSchedules.size() + " schedules generated:");
         int i = 0;
-        for (Queue<Showtime> showtimes : schedule) {
+        for (Schedule schedule : possibleSchedules) {
             i++;
             System.out.println("Schedule " + i + ":");
-            for (Showtime showtime : showtimes) {
-                System.out.println("\t" + showtime.getTime() + " " + showtime.getMovie()
-                                                                             .getTitle());
+            for (Showtime showtime : schedule.getShowtimes()) {
+                System.out.println("\t" + showtime.toFriendlyString());
+                Duration delay = schedule.getDelayAfterShowtime(showtime);
+                if (delay != null) {
+                    System.out.println("\tDelay of " + delay.getStandardMinutes() + " minutes");
+                }
             }
         }
     }
@@ -69,22 +77,31 @@ public class Main {
         String currentDate = LocalDate.now()
                                       .toString();
         String postcode = "M5T 1N5";
-        String apiKey = "xv4za7trkge9yrz4b4h6ws9s";
+
 
         final CountDownLatch cdl = new CountDownLatch(1);
 
-        api.getMovies(currentDate, postcode, apiKey, new Callback<List<ApiMovie>>() {
-            @Override
-            public void success(List<ApiMovie> apiMovieList, Response response) {
-                reorganizeMovies(apiMovieList);
-                cdl.countDown();
-            }
+        api.getMovies(
+                currentDate, //date
+                null, //num days (default 1 if null)
+                postcode,
+                null, //latitude (not needed if using postcode)
+                null, //longitude (not needed if using postcode)
+                null, //radius (default 5 if null)
+                API_KM, //radius unit (default miles if null)
+                API_KEY,
+                new Callback<List<ApiMovie>>() {
+                    @Override
+                    public void success(List<ApiMovie> apiMovieList, Response response) {
+                        reorganizeMovies(apiMovieList);
+                        cdl.countDown();
+                    }
 
-            @Override
-            public void failure(RetrofitError error) {
-                System.out.println("error = " + error);
-            }
-        });
+                    @Override
+                    public void failure(RetrofitError error) {
+                        System.out.println("error = " + error);
+                    }
+                });
 
         try {
             cdl.await();
@@ -168,30 +185,30 @@ public class Main {
         return desiredMovies;
     }
 
-    private void generateSchedule(Theatre theatre, List<Movie> movies, LocalDateTime startTime, List<Queue<Showtime>> schedule, Deque<Showtime> currentPermutation) {
+    private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
         if (movies.size() == 0) {
-            schedule.add(new LinkedList<>(currentPermutation));
+            possibleSchedules.add(new Schedule(currentPermutation));
             return;
         }
         for (Movie movie : movies) {
             Showtime showtime;
-            LocalDateTime nextAvailableStartTime = startTime;
+            DateTime nextAvailableStartTime = startTime;
             while ((showtime = findNextShowtimeForMovie(theatre, movie, nextAvailableStartTime)) != null) {
                 currentPermutation.add(showtime);
                 List<Movie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
-                nextAvailableStartTime = showtime.getDateTime()
+                nextAvailableStartTime = showtime.getStartDateTime()
                                                  .plus(movie.getTotalLength());
-                generateSchedule(theatre, remainingMovies, nextAvailableStartTime, schedule, currentPermutation);
+                generateSchedule(theatre, remainingMovies, nextAvailableStartTime, possibleSchedules, currentPermutation);
                 currentPermutation.removeLast();
             }
         }
 
     }
 
-    private Showtime findNextShowtimeForMovie(Theatre theatre, Movie movie, LocalDateTime startTime) {
+    private Showtime findNextShowtimeForMovie(Theatre theatre, Movie movie, DateTime startTime) {
         for (Showtime showtime : theatre.getShowtimes()) {
-            LocalDateTime dateTime = showtime.getDateTime();
+            DateTime dateTime = showtime.getStartDateTime();
             if (showtime.getMovie()
                         .equals(movie) && dateTime.isAfter(startTime)) {
                 return showtime;

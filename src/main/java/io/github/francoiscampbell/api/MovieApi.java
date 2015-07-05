@@ -13,5 +13,15 @@ import java.util.List;
 public interface MovieApi {
 
     @GET("/v1.1/movies/showings")
-    void getMovies(@Query("startDate") String startDate, @Query("zip") String postcode, @Query("api_key") String apiKey, Callback<List<ApiMovie>> response);
+    void getMovies(
+            @Query("startDate") String startDate,
+            @Query("numDays") Integer numDays,
+            @Query("zip") String postcode,
+            @Query("lat") Float lat,
+            @Query("lng") Float lng,
+            @Query("radius") Float radius,
+            @Query("units") String units,
+            @Query("api_key") String apiKey,
+            Callback<List<ApiMovie>> response
+    );
 }
