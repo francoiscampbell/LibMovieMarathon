@@ -1,10 +1,11 @@
 package io.github.francoiscampbell.model;
 
 import io.github.francoiscampbell.apimodel.ApiMovie;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -12,23 +13,43 @@ import java.util.Objects;
  */
 public class Movie {
     private String id;
-    private String name;
+    private String title;
     private Duration runningLength;
-    private List<Showtime> showtimes;
+    private Duration previewsLength;
 
-    public Movie(String runningLength, String name, String id) {
-        this.runningLength = Duration.parse(runningLength);
-        this.name = name;
+    public Movie(String runningLength, String title, String id) {
+        PeriodFormatterBuilder builder = new PeriodFormatterBuilder();
+        builder.appendPrefix("PT")
+               .appendHours()
+               .appendSuffix("H")
+               .appendMinutes()
+               .appendSuffix("M");
+        PeriodFormatter formatter = builder.toFormatter();
+        Period p = formatter.parsePeriod(runningLength);
+        this.runningLength = p.toStandardDuration();
+        this.previewsLength = Duration.standardMinutes(15); //default 15 mins of previews
+        this.title = title;
         this.id = id;
-        showtimes = new ArrayList<>();
     }
 
-    public Movie(ApiMovie apiMovie){
+    public Movie(ApiMovie apiMovie) {
         this(apiMovie.getRunTime(), apiMovie.getTitle(), apiMovie.getTmsId());
     }
 
-    public void addShowtime(Showtime showtime){
-        showtimes.add(showtime);
+    public String getTitle() {
+        return title;
+    }
+
+    public Duration getRunningLength() {
+        return runningLength;
+    }
+
+    public Duration getPreviewsLength() {
+        return previewsLength;
+    }
+
+    public Duration getTotalLength() {
+        return getRunningLength().plus(getPreviewsLength());
     }
 
     @Override
@@ -40,5 +61,10 @@ public class Movie {
 
         return Objects.equals(id, movie.id);
 
+    }
+
+    @Override
+    public String toString() {
+        return title;
     }
 }

@@ -12,23 +12,24 @@ import java.util.Objects;
 public class Theatre {
     private String id;
     private String name;
-    private List<Movie> movieList;
-
-    private int previewsLength;
+    private List<Showtime> showtimeList;
 
     public Theatre(String id, String name) {
         this.id = id;
         this.name = name;
-        movieList = new ArrayList<>();
-        previewsLength = 15; //default
+        showtimeList = new ArrayList<>();
     }
 
     public Theatre(ApiTheatre apiTheatre){
         this(apiTheatre.getId(),apiTheatre.getName());
     }
 
-    public List<Movie> getMovieList() {
-        return movieList;
+    public String getName() {
+        return name;
+    }
+
+    public List<Showtime> getShowtimes() {
+        return showtimeList;
     }
 
     @Override
@@ -40,5 +41,10 @@ public class Theatre {
 
         return Objects.equals(id, theatre.id);
 
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
