@@ -5,7 +5,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import javax.annotation.Generated;
-import java.util.Date;
 
 @Generated("org.jsonschema2pojo")
 public class ApiShowtime {
@@ -14,7 +13,7 @@ public class ApiShowtime {
     @SerializedName("theatre")
     private ApiTheatre apiTheatre;
     @Expose
-    private Date dateTime;
+    private String dateTime;
     @Expose
     private String quals;
     @Expose
@@ -48,7 +47,7 @@ public class ApiShowtime {
      * @return
      *     The dateTime
      */
-    public Date getDateTime() {
+    public String getDateTime() {
         return dateTime;
     }
 
@@ -57,11 +56,11 @@ public class ApiShowtime {
      * @param dateTime
      *     The dateTime
      */
-    public void setDateTime(Date dateTime) {
+    public void setDateTime(String dateTime) {
         this.dateTime = dateTime;
     }
 
-    public ApiShowtime withDateTime(Date dateTime) {
+    public ApiShowtime withDateTime(String dateTime) {
         this.dateTime = dateTime;
         return this;
     }
