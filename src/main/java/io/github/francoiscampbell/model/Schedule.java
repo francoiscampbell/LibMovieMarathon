@@ -9,11 +9,13 @@ import java.util.*;
  * Created by francois on 15-07-04.
  */
 public class Schedule {
+    private Theatre theatre;
     private Deque<Showtime> showtimes;
     private Map<Showtime, Duration> delays;
 
-    public Schedule(Deque<Showtime> showtimes) {
+    public Schedule(Deque<Showtime> showtimes, Theatre theatre) {
         this.showtimes = new LinkedList<>(showtimes);
+        this.theatre = theatre;
         this.delays = calculateDelays(showtimes);
     }
 
@@ -37,5 +39,9 @@ public class Schedule {
 
     public Deque<Showtime> getShowtimes() {
         return showtimes;
+    }
+
+    public Theatre getTheatre() {
+        return theatre;
     }
 }

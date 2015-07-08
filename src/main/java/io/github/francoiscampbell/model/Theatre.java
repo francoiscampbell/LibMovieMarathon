@@ -12,12 +12,12 @@ import java.util.Objects;
 public class Theatre {
     private String id;
     private String name;
-    private List<Showtime> showtimeList;
+    private List<Showtime> showtimes;
 
     public Theatre(String id, String name) {
         this.id = id;
         this.name = name;
-        showtimeList = new ArrayList<>();
+        showtimes = new ArrayList<>();
     }
 
     public Theatre(ApiTheatre apiTheatre){
@@ -29,7 +29,18 @@ public class Theatre {
     }
 
     public List<Showtime> getShowtimes() {
-        return showtimeList;
+        return showtimes;
+    }
+
+    public List<Movie> getMoviesPlayingHere() {
+        List<Movie> movies = new ArrayList<>();
+        for (Showtime s : showtimes) {
+            Movie m = s.getMovie();
+            if (!movies.contains(m)) {
+                movies.add(m);
+            }
+        }
+        return movies;
     }
 
     @Override
