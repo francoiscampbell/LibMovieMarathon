@@ -26,22 +26,35 @@ public class Main {
     private static final String API_KM = "km";
     private static final String API_MILES = "mi";
     private static final String API_KEY = "xv4za7trkge9yrz4b4h6ws9s";
-    private List<Theatre> theatres;
+    private List<Theatre> allTheatres;
+    private List<Movie> allMovies;
 
     public Main() {
-        theatres = new ArrayList<>();
+        allTheatres = new ArrayList<>();
+        allMovies = new ArrayList<>();
+    }
+
+    public void start() {
         getMovies();
         sortAllShowtimes();
-        do {
-            Theatre theatre = selectTheatre(theatres);
-            List<Movie> movies = selectMovies(theatre);
+        mainLoop();
+    }
 
-            List<Schedule> possibleSchedules = new ArrayList<>();
-            Deque<Showtime> currentPermutation = new LinkedList<>();
-            generateSchedule(theatre, movies, new DateTime(0), possibleSchedules, currentPermutation);
-            printSchedules(possibleSchedules);
+    private void mainLoop() {
+        do {
+            List<Movie> desiredMovies = selectMoviesFromList(allMovies);
+            for (Theatre t : allTheatres) {
+                if (t.getMoviesPlayingHere()
+                     .containsAll(desiredMovies)) {
+                    List<Schedule> possibleSchedules = new ArrayList<>();
+                    Deque<Showtime> currentPermutation = new LinkedList<>();
+                    generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
+                    printSchedules(possibleSchedules);
+                }
+            }
         } while (!quit());
     }
+
 
     private boolean quit() {
         System.out.println("Type 'q' to quit");
@@ -54,7 +67,8 @@ public class Main {
         int i = 0;
         for (Schedule schedule : possibleSchedules) {
             i++;
-            System.out.println("Schedule " + i + ":");
+            System.out.println("Schedule " + i + " at " + schedule.getTheatre()
+                                                                  .getName() + ":");
             for (Showtime showtime : schedule.getShowtimes()) {
                 System.out.println("\t" + showtime.toFriendlyString());
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
@@ -66,7 +80,7 @@ public class Main {
     }
 
 
-    public void getMovies() {
+    private void getMovies() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setEndpoint(API_URL)
@@ -123,14 +137,15 @@ public class Main {
                 break; //null runtime events can't be planned (usually theatre events, etc)
             }
             Movie movie = new Movie(apiMovie);
+            allMovies.add(movie);
             for (ApiShowtime apiShowtime : apiMovie.getApiShowtimes()) {
                 //if the theatre is in the list, get it
                 //if it's not, add a new theatre to the list
                 Theatre theatre = new Theatre(apiShowtime.getApiTheatre());
                 try {
-                    theatre = theatres.get(theatres.indexOf(theatre));
+                    theatre = allTheatres.get(allTheatres.indexOf(theatre));
                 } catch (IndexOutOfBoundsException e) {
-                    theatres.add(theatre);
+                    allTheatres.add(theatre);
                 }
 
                 Showtime showtime = new Showtime(apiShowtime, movie);
@@ -141,7 +156,7 @@ public class Main {
     }
 
     private void sortAllShowtimes() {
-        for (Theatre t : theatres) {
+        for (Theatre t : allTheatres) {
             sortShowtimes(t);
         }
     }
@@ -161,17 +176,11 @@ public class Main {
         return theatres.get(selection);
     }
 
-    private List<Movie> selectMovies(Theatre theatre) {
+    private List<Movie> selectMoviesFromList(List<Movie> movies) {
         System.out.println("Select movie: ");
-        List<Showtime> showtimes = theatre.getShowtimes();
-        Set<Movie> listedMovies = new HashSet<>();
-        for (int i = 0; i < showtimes.size(); i++) {
-            Showtime showtime = showtimes.get(i);
-            Movie m = showtime.getMovie();
-            if (!listedMovies.contains(m)) {
-                System.out.println("\t" + i + ") " + m.getTitle());
-                listedMovies.add(m);
-            }
+        for (int i = 0; i < movies.size(); i++) {
+            Movie m = movies.get(i);
+            System.out.println("\t" + i + ") " + m.getTitle());
         }
         List<Movie> desiredMovies = new ArrayList<>();
         Scanner s = new Scanner(System.in);
@@ -179,15 +188,19 @@ public class Main {
         String[] selectionsArray = selections.split(",");
         for (String sel : selectionsArray) {
             int selection = Integer.parseInt(sel);
-            desiredMovies.add(showtimes.get(selection)
-                                       .getMovie());
+            desiredMovies.add(movies.get(selection));
         }
         return desiredMovies;
     }
 
+
+    private List<Movie> selectMoviesFromTheatre(Theatre theatre) {
+        return selectMoviesFromList(theatre.getMoviesPlayingHere());
+    }
+
     private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
         if (movies.size() == 0) {
-            possibleSchedules.add(new Schedule(currentPermutation));
+            possibleSchedules.add(new Schedule(currentPermutation, theatre));
             return;
         }
         for (Movie movie : movies) {
@@ -219,6 +232,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-        new Main();
+        new Main().start();
     }
 }
