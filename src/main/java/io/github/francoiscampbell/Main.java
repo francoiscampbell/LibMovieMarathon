@@ -92,7 +92,10 @@ public class Main {
                                       .toString();
         String postcode = "M5T 1N5";
 
-
+        //retrofit delivers results on secondary thread, so wait to get results
+        //I know this is wrong, I just want to concentrate on
+        //the actual response data for now
+        //TODO: Make asynchronous, possibly using RxJava
         final CountDownLatch cdl = new CountDownLatch(1);
 
         api.getMovies(
@@ -108,7 +111,7 @@ public class Main {
                     @Override
                     public void success(List<ApiMovie> apiMovieList, Response response) {
                         reorganizeMovies(apiMovieList);
-                        cdl.countDown();
+                        cdl.countDown(); //count down the latch to unfreeze the main thread TODO: do it better
                     }
 
                     @Override
