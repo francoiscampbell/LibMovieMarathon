@@ -33,6 +33,10 @@ public class Schedule {
         return delays;
     }
 
+    public Map<Showtime, Duration> getDelays() {
+        return delays;
+    }
+
     public Duration getDelayAfterShowtime(Showtime showtime) {
         return delays.get(showtime);
     }

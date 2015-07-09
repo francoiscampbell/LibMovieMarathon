@@ -15,7 +15,9 @@ import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -45,7 +47,7 @@ public class Main {
             List<Movie> desiredMovies = selectMoviesFromList(allMovies);
             for (Theatre t : allTheatres) {
                 if (t.getMoviesPlayingHere()
-                     .containsAll(desiredMovies)) {
+                        .containsAll(desiredMovies)) {
                     List<Schedule> possibleSchedules = new ArrayList<>();
                     Deque<Showtime> currentPermutation = new LinkedList<>();
                     generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
@@ -59,24 +61,45 @@ public class Main {
     private boolean quit() {
         System.out.println("Type 'q' to quit");
         return new Scanner(System.in).next()
-                                     .startsWith("q");
+                .startsWith("q");
     }
 
     private void printSchedules(List<Schedule> possibleSchedules) {
         System.out.println(possibleSchedules.size() + " schedules generated:");
+
         int i = 0;
         for (Schedule schedule : possibleSchedules) {
             i++;
             System.out.println("Schedule " + i + " at " + schedule.getTheatre()
-                                                                  .getName() + ":");
+                    .getName() + ":");
+
+            Map<Showtime, Duration> delays = schedule.getDelays();
+            Duration minDelay = Collections.min(delays.values());
+            Duration maxDelay = Collections.max(delays.values());
+            Duration difference = maxDelay.minus(minDelay);
+
+            float[] redHsb = Color.RGBtoHSB(255, 0, 0, null);
+            float[] greenHsb = Color.RGBtoHSB(0, 255, 0, null);
+
             for (Showtime showtime : schedule.getShowtimes()) {
                 System.out.println("\t" + showtime.toFriendlyString());
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
                 if (delay != null) {
+                    float ratio = protectedDivide(delay.minus(minDelay).getMillis(), difference.getMillis(), 1);
+                    float inverseRatio = 1 - ratio;
+                    float h = greenHsb[0] * ratio + redHsb[0] * inverseRatio;
+                    float s = greenHsb[1] * ratio + redHsb[1] * inverseRatio;
+                    float v = greenHsb[2] * ratio + redHsb[2] * inverseRatio;
+                    Color lerp = Color.getHSBColor(h, s, v);
+                    System.out.println("lerp = " + lerp);
                     System.out.println("\tDelay of " + delay.getStandardMinutes() + " minutes");
                 }
             }
         }
+    }
+
+    private static float protectedDivide(float dividend, float divisor, float defVal) {
+        return divisor == 0 ? defVal : dividend / divisor;
     }
 
 
@@ -89,7 +112,7 @@ public class Main {
         MovieApi api = restAdapter.create(MovieApi.class);
 
         String currentDate = LocalDate.now()
-                                      .toString();
+                .toString();
         String postcode = "M5T 1N5";
 
         //retrofit delivers results on secondary thread, so wait to get results
@@ -153,7 +176,7 @@ public class Main {
 
                 Showtime showtime = new Showtime(apiShowtime, movie);
                 theatre.getShowtimes()
-                       .add(showtime);
+                        .add(showtime);
             }
         }
     }
@@ -214,7 +237,7 @@ public class Main {
                 List<Movie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
                 nextAvailableStartTime = showtime.getStartDateTime()
-                                                 .plus(movie.getTotalLength());
+                        .plus(movie.getTotalLength());
                 generateSchedule(theatre, remainingMovies, nextAvailableStartTime, possibleSchedules, currentPermutation);
                 currentPermutation.removeLast();
             }
@@ -226,7 +249,7 @@ public class Main {
         for (Showtime showtime : theatre.getShowtimes()) {
             DateTime dateTime = showtime.getStartDateTime();
             if (showtime.getMovie()
-                        .equals(movie) && dateTime.isAfter(startTime)) {
+                    .equals(movie) && dateTime.isAfter(startTime)) {
                 return showtime;
             }
         }
