@@ -1,6 +1,7 @@
 package io.github.francoiscampbell;
 
 import io.github.francoiscampbell.api.MovieApi;
+import io.github.francoiscampbell.api.Request;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import io.github.francoiscampbell.apimodel.ApiShowtime;
 import io.github.francoiscampbell.model.Movie;
@@ -31,6 +32,11 @@ public class Main {
     private List<Theatre> allTheatres;
     private List<Movie> allMovies;
 
+    /**
+     * Main
+     * This class is a placeholder for a real application. It's just used to develop the logic
+     * TODO: Refactor to make this a proper application
+     */
     public Main() {
         allTheatres = new ArrayList<>();
         allMovies = new ArrayList<>();
@@ -61,7 +67,7 @@ public class Main {
     private boolean quit() {
         System.out.println("Type 'q' to quit");
         return new Scanner(System.in).next()
-                .startsWith("q");
+                                     .startsWith("q");
     }
 
     private void printSchedules(List<Schedule> possibleSchedules) {
@@ -102,7 +108,6 @@ public class Main {
         return divisor == 0 ? defVal : dividend / divisor;
     }
 
-
     private void getMovies() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
@@ -112,8 +117,12 @@ public class Main {
         MovieApi api = restAdapter.create(MovieApi.class);
 
         String currentDate = LocalDate.now()
-                .toString();
-        String postcode = "M5T 1N5";
+                                      .toString();
+        Request request = new Request.RequestBuilder(currentDate).endpoint(restAdapter)
+                                                                 .apiKey(API_KEY)
+                                                                 .postcode("M5T 1N5")
+                                                                 .radiusUnit(Request.RadiusUnit.KM)
+                                                                 .build();
 
         //retrofit delivers results on secondary thread, so wait to get results
         //I know this is wrong, I just want to concentrate on
@@ -121,27 +130,18 @@ public class Main {
         //TODO: Make asynchronous, possibly using RxJava
         final CountDownLatch cdl = new CountDownLatch(1);
 
-        api.getMovies(
-                currentDate, //date
-                null, //num days (default 1 if null)
-                postcode,
-                null, //latitude (not needed if using postcode)
-                null, //longitude (not needed if using postcode)
-                null, //radius (default 5 if null)
-                API_KM, //radius unit (default miles if null)
-                API_KEY,
-                new Callback<List<ApiMovie>>() {
-                    @Override
-                    public void success(List<ApiMovie> apiMovieList, Response response) {
-                        reorganizeMovies(apiMovieList);
-                        cdl.countDown(); //count down the latch to unfreeze the main thread TODO: do it better
-                    }
+        request.execute(new Callback<List<ApiMovie>>() {
+            @Override
+            public void success(List<ApiMovie> apiMovieList, Response response) {
+                reorganizeMovies(apiMovieList);
+                cdl.countDown(); //count down the latch to unfreeze the main thread TODO: do it better
+            }
 
-                    @Override
-                    public void failure(RetrofitError error) {
-                        System.out.println("error = " + error);
-                    }
-                });
+            @Override
+            public void failure(RetrofitError error) {
+                System.out.println("error = " + error);
+            }
+        });
 
         try {
             cdl.await();
@@ -176,7 +176,7 @@ public class Main {
 
                 Showtime showtime = new Showtime(apiShowtime, movie);
                 theatre.getShowtimes()
-                        .add(showtime);
+                       .add(showtime);
             }
         }
     }
@@ -237,7 +237,7 @@ public class Main {
                 List<Movie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
                 nextAvailableStartTime = showtime.getStartDateTime()
-                        .plus(movie.getTotalLength());
+                                                 .plus(movie.getTotalLength());
                 generateSchedule(theatre, remainingMovies, nextAvailableStartTime, possibleSchedules, currentPermutation);
                 currentPermutation.removeLast();
             }
@@ -249,7 +249,7 @@ public class Main {
         for (Showtime showtime : theatre.getShowtimes()) {
             DateTime dateTime = showtime.getStartDateTime();
             if (showtime.getMovie()
-                    .equals(movie) && dateTime.isAfter(startTime)) {
+                        .equals(movie) && dateTime.isAfter(startTime)) {
                 return showtime;
             }
         }
