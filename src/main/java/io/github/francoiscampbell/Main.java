@@ -53,7 +53,7 @@ public class Main {
             List<Movie> desiredMovies = selectMoviesFromList(allMovies);
             for (Theatre t : allTheatres) {
                 if (t.getMoviesPlayingHere()
-                        .containsAll(desiredMovies)) {
+                     .containsAll(desiredMovies)) {
                     List<Schedule> possibleSchedules = new ArrayList<>();
                     Deque<Showtime> currentPermutation = new LinkedList<>();
                     generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
@@ -77,7 +77,7 @@ public class Main {
         for (Schedule schedule : possibleSchedules) {
             i++;
             System.out.println("Schedule " + i + " at " + schedule.getTheatre()
-                    .getName() + ":");
+                                                                  .getName() + ":");
 
             Map<Showtime, Duration> delays = schedule.getDelays();
             Duration minDelay = Collections.min(delays.values());
@@ -91,7 +91,8 @@ public class Main {
                 System.out.println("\t" + showtime.toFriendlyString());
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
                 if (delay != null) {
-                    float ratio = protectedDivide(delay.minus(minDelay).getMillis(), difference.getMillis(), 1);
+                    float ratio = MoreMath.protectedDivide(delay.minus(minDelay)
+                                                                .getMillis(), difference.getMillis(), 1);
                     float inverseRatio = 1 - ratio;
                     float h = greenHsb[0] * ratio + redHsb[0] * inverseRatio;
                     float s = greenHsb[1] * ratio + redHsb[1] * inverseRatio;
@@ -102,10 +103,6 @@ public class Main {
                 }
             }
         }
-    }
-
-    private static float protectedDivide(float dividend, float divisor, float defVal) {
-        return divisor == 0 ? defVal : dividend / divisor;
     }
 
     private void getMovies() {
