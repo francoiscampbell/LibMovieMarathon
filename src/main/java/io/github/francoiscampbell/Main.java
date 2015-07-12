@@ -1,6 +1,5 @@
 package io.github.francoiscampbell;
 
-import io.github.francoiscampbell.api.MovieApi;
 import io.github.francoiscampbell.api.Request;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import io.github.francoiscampbell.apimodel.ApiShowtime;
@@ -111,8 +110,6 @@ public class Main {
                 .setEndpoint(API_URL)
                 .build();
 
-        MovieApi api = restAdapter.create(MovieApi.class);
-
         String currentDate = LocalDate.now()
                                       .toString();
         Request request = new Request.RequestBuilder(currentDate).endpoint(restAdapter)
@@ -157,7 +154,7 @@ public class Main {
     private void reorganizeMovies(List<ApiMovie> apiMovieList) {
         for (ApiMovie apiMovie : apiMovieList) {
             if (apiMovie.getRunTime() == null) {
-                break; //null runtime events can't be planned (usually theatre events, etc)
+                continue; //null runtime events can't be planned (usually theatre events, etc)
             }
             Movie movie = new Movie(apiMovie);
             allMovies.add(movie);
