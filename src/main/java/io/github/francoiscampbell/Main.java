@@ -10,15 +10,11 @@ import io.github.francoiscampbell.model.Theatre;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;
-import retrofit.Callback;
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by francois on 15-07-02.
@@ -117,32 +113,8 @@ public class Main {
                                                                  .postcode("M5T 1N5")
                                                                  .radiusUnit(Request.RadiusUnit.KM)
                                                                  .build();
-
-        //retrofit delivers results on secondary thread, so wait to get results
-        //I know this is wrong, I just want to concentrate on
-        //the actual response data for now
-        //TODO: Make asynchronous, possibly using RxJava
-        final CountDownLatch cdl = new CountDownLatch(1);
-
-        request.execute(new Callback<List<ApiMovie>>() {
-            @Override
-            public void success(List<ApiMovie> apiMovieList, Response response) {
-                reorganizeMovies(apiMovieList);
-                cdl.countDown(); //count down the latch to unfreeze the main thread TODO: do it better
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                System.out.println("error = " + error);
-            }
-        });
-
-        try {
-            cdl.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        List<ApiMovie> apiMovies = request.execute();
+        reorganizeMovies(apiMovies);
     }
 
     /**

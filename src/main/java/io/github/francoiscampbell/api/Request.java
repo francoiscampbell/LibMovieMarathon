@@ -1,7 +1,6 @@
 package io.github.francoiscampbell.api;
 
 import io.github.francoiscampbell.apimodel.ApiMovie;
-import retrofit.Callback;
 import retrofit.RestAdapter;
 
 import java.util.List;
@@ -34,9 +33,9 @@ public class Request {
         searchRadius = builder.searchRadius;
     }
 
-    public void execute(Callback<List<ApiMovie>> callback) {
+    public List<ApiMovie> execute() {
         MovieApi api = endpoint.create(MovieApi.class);
-        api.getMovies(
+        return api.getMovies(
                 startDate, //date
                 numDays, //num days (default 1 if null)
                 postcode,
@@ -44,8 +43,7 @@ public class Request {
                 lon, //longitude (not needed if using postcode)
                 searchRadius, //radius (default 5 if null)
                 radiusUnit, //radius unit (default miles if null)
-                apiKey,
-                callback);
+                apiKey);
     }
 
     public static class RequestBuilder {
