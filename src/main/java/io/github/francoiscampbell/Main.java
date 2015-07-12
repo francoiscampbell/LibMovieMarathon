@@ -122,9 +122,7 @@ public class Main {
                .flatMap(Observable::from)
                .filter(apiMovie -> apiMovie.getRunTime() != null)
                .map(Movie::new)
-               .doOnNext(allMovies::add)
-               .map(Movie::getTitle)
-               .subscribe(System.out::println, Throwable::getCause, this::sortAllShowtimes);
+               .subscribe(allMovies::add, Throwable::printStackTrace, this::sortAllShowtimes);
     }
 
     /**
