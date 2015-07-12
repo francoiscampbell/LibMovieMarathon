@@ -5,13 +5,15 @@ import retrofit.http.GET;
 import retrofit.http.Query;
 import rx.Observable;
 
+import java.util.List;
+
 /**
  * Created by francois on 15-07-02.
  */
 public interface MovieApiRx {
 
     @GET("/v1.1/movies/showings")
-    Observable<ApiMovie> getMovies(
+    Observable<List<ApiMovie>> getMovies(
             @Query("startDate") String startDate,
             @Query("numDays") Integer numDays,
             @Query("zip") String postcode,

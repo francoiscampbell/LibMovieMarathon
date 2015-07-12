@@ -49,7 +49,7 @@ public class Request {
                 callback);
     }
 
-    public Observable<ApiMovie> execute() {
+    public Observable<List<ApiMovie>> execute() {
         MovieApiRx api = endpoint.create(MovieApiRx.class);
         return api.getMovies(
                 startDate, //date

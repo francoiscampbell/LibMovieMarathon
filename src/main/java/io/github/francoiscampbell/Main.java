@@ -12,7 +12,6 @@ import org.joda.time.Duration;
 import org.joda.time.LocalDate;
 import retrofit.RestAdapter;
 import rx.Observable;
-import rx.schedulers.Schedulers;
 
 import java.awt.*;
 import java.util.*;
@@ -115,46 +114,17 @@ public class Main {
                                                                  .radiusUnit(Request.RadiusUnit.KM)
                                                                  .build();
 
+        System.out.println("Current thread: " + Thread.currentThread()
+                                                      .getName());
+        System.out.println("Starting progress dialog");
+
         request.execute()
-               .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.immediate())
-//               .filter(apiMovie -> apiMovie.getRunTime() != null)
-//               .map(Movie::new)
-                .subscribe(movie -> System.out.println("movie"));
-//               .subscribe(movie -> System.out.println(movie.getTitle()));
-//               .map(Movie::getTitle)
-//               .subscribe(System.out::println);
-
-        Observable.range(0, 10)
-                  .subscribe(System.out::println);
-
-        //retrofit delivers results on secondary thread, so wait to get results
-        //I know this is wrong, I just want to concentrate on
-        //the actual response data for now
-        //TODO: Make asynchronous, possibly using RxJava
-//        final CountDownLatch cdl = new CountDownLatch(1);
-//
-//        request.execute(new Callback<List<ApiMovie>>() {
-//            @Override
-//            public void success(List<ApiMovie> apiMovieList, Response response) {
-//                reorganizeMovies(apiMovieList);
-//                cdl.countDown(); //count down the latch to unfreeze the main thread TODO: do it better
-//            }
-//
-//            @Override
-//            public void failure(RetrofitError error) {
-//                System.out.println("error = " + error);
-//            }
-//        });
-//
-//        //map apiMovie to new Movie(apiMovie)
-//
-//        try {
-//            cdl.await();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
+               .flatMap(Observable::from)
+               .filter(apiMovie -> apiMovie.getRunTime() != null)
+               .map(Movie::new)
+               .doOnNext(allMovies::add)
+               .map(Movie::getTitle)
+               .subscribe(System.out::println, Throwable::getCause, this::sortAllShowtimes);
     }
 
     /**
