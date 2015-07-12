@@ -3,6 +3,7 @@ package io.github.francoiscampbell.api;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import retrofit.Callback;
 import retrofit.RestAdapter;
+import rx.Observable;
 
 import java.util.List;
 
@@ -46,6 +47,19 @@ public class Request {
                 radiusUnit, //radius unit (default miles if null)
                 apiKey,
                 callback);
+    }
+
+    public Observable<ApiMovie> execute() {
+        MovieApiRx api = endpoint.create(MovieApiRx.class);
+        return api.getMovies(
+                startDate, //date
+                numDays, //num days (default 1 if null)
+                postcode,
+                lat, //latitude (not needed if using postcode)
+                lon, //longitude (not needed if using postcode)
+                searchRadius, //radius (default 5 if null)
+                radiusUnit, //radius unit (default miles if null)
+                apiKey);
     }
 
     public static class RequestBuilder {

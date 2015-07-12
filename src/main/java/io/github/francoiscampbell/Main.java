@@ -1,6 +1,5 @@
 package io.github.francoiscampbell;
 
-import io.github.francoiscampbell.api.MovieApi;
 import io.github.francoiscampbell.api.Request;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import io.github.francoiscampbell.apimodel.ApiShowtime;
@@ -11,24 +10,21 @@ import io.github.francoiscampbell.model.Theatre;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;
-import retrofit.Callback;
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import rx.Observable;
+import rx.schedulers.Schedulers;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by francois on 15-07-02.
  */
 public class Main {
     private static final String API_URL = "http://data.tmsapi.com";
-    private static final String API_KM = "km";
-    private static final String API_MILES = "mi";
     private static final String API_KEY = "xv4za7trkge9yrz4b4h6ws9s";
+
     private List<Theatre> allTheatres;
     private List<Movie> allMovies;
 
@@ -111,8 +107,6 @@ public class Main {
                 .setEndpoint(API_URL)
                 .build();
 
-        MovieApi api = restAdapter.create(MovieApi.class);
-
         String currentDate = LocalDate.now()
                                       .toString();
         Request request = new Request.RequestBuilder(currentDate).endpoint(restAdapter)
@@ -121,30 +115,45 @@ public class Main {
                                                                  .radiusUnit(Request.RadiusUnit.KM)
                                                                  .build();
 
+        request.execute()
+               .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.immediate())
+//               .filter(apiMovie -> apiMovie.getRunTime() != null)
+//               .map(Movie::new)
+                .subscribe(movie -> System.out.println("movie"));
+//               .subscribe(movie -> System.out.println(movie.getTitle()));
+//               .map(Movie::getTitle)
+//               .subscribe(System.out::println);
+
+        Observable.range(0, 10)
+                  .subscribe(System.out::println);
+
         //retrofit delivers results on secondary thread, so wait to get results
         //I know this is wrong, I just want to concentrate on
         //the actual response data for now
         //TODO: Make asynchronous, possibly using RxJava
-        final CountDownLatch cdl = new CountDownLatch(1);
-
-        request.execute(new Callback<List<ApiMovie>>() {
-            @Override
-            public void success(List<ApiMovie> apiMovieList, Response response) {
-                reorganizeMovies(apiMovieList);
-                cdl.countDown(); //count down the latch to unfreeze the main thread TODO: do it better
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                System.out.println("error = " + error);
-            }
-        });
-
-        try {
-            cdl.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        final CountDownLatch cdl = new CountDownLatch(1);
+//
+//        request.execute(new Callback<List<ApiMovie>>() {
+//            @Override
+//            public void success(List<ApiMovie> apiMovieList, Response response) {
+//                reorganizeMovies(apiMovieList);
+//                cdl.countDown(); //count down the latch to unfreeze the main thread TODO: do it better
+//            }
+//
+//            @Override
+//            public void failure(RetrofitError error) {
+//                System.out.println("error = " + error);
+//            }
+//        });
+//
+//        //map apiMovie to new Movie(apiMovie)
+//
+//        try {
+//            cdl.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
