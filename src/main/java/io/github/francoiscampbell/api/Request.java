@@ -50,7 +50,7 @@ public class Request {
     }
 
     public Observable<List<ApiMovie>> execute() {
-        MovieApiRx api = endpoint.create(MovieApiRx.class);
+        MovieApi api = endpoint.create(MovieApi.class);
         return api.getMovies(
                 startDate, //date
                 numDays, //num days (default 1 if null)
