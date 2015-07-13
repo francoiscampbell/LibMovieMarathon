@@ -3,6 +3,7 @@ package io.github.francoiscampbell;
 import io.github.francoiscampbell.api.Request;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import io.github.francoiscampbell.apimodel.ApiShowtime;
+import io.github.francoiscampbell.collections.SelfMap;
 import io.github.francoiscampbell.model.Movie;
 import io.github.francoiscampbell.model.Schedule;
 import io.github.francoiscampbell.model.Showtime;
@@ -28,7 +29,7 @@ public class Main {
     private static final String API_KM = "km";
     private static final String API_MILES = "mi";
     private static final String API_KEY = "xv4za7trkge9yrz4b4h6ws9s";
-    private List<Theatre> allTheatres;
+    private SelfMap<Theatre> allTheatres;
     private List<Movie> allMovies;
 
     /**
@@ -37,7 +38,7 @@ public class Main {
      * TODO: Refactor to make this a proper application
      */
     public Main() {
-        allTheatres = new ArrayList<>();
+        allTheatres = new SelfMap<>();
         allMovies = new ArrayList<>();
     }
 
@@ -50,7 +51,7 @@ public class Main {
     private void mainLoop() {
         do {
             List<Movie> desiredMovies = selectMoviesFromList(allMovies);
-            for (Theatre t : allTheatres) {
+            for (Theatre t : allTheatres.keySet()) {
                 if (t.getMoviesPlayingHere()
                      .containsAll(desiredMovies)) {
                     List<Schedule> possibleSchedules = new ArrayList<>();
@@ -159,15 +160,7 @@ public class Main {
             Movie movie = new Movie(apiMovie);
             allMovies.add(movie);
             for (ApiShowtime apiShowtime : apiMovie.getApiShowtimes()) {
-                //if the theatre is in the list, get it
-                //if it's not, add a new theatre to the list
-                Theatre theatre = new Theatre(apiShowtime.getApiTheatre());
-                if (allTheatres.contains(theatre)) {
-                    theatre = allTheatres.get(allTheatres.indexOf(theatre));
-                } else {
-                    allTheatres.add(theatre);
-                }
-
+                Theatre theatre = allTheatres.putIfAbsent(new Theatre(apiShowtime.getApiTheatre()));
                 Showtime showtime = new Showtime(apiShowtime, movie);
                 theatre.getShowtimes()
                        .add(showtime);
@@ -176,7 +169,7 @@ public class Main {
     }
 
     private void sortAllShowtimes() {
-        for (Theatre t : allTheatres) {
+        for (Theatre t : allTheatres.keySet()) {
             sortShowtimes(t);
         }
     }
