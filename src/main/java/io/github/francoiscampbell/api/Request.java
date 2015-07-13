@@ -20,7 +20,7 @@ public class Request {
     private String radiusUnit;
     private Float searchRadius;
 
-    private Request(RequestBuilder builder) {
+    private Request(Builder builder) {
         endpoint = builder.endpoint;
         apiKey = builder.apiKey;
 
@@ -46,7 +46,7 @@ public class Request {
                 apiKey);
     }
 
-    public static class RequestBuilder {
+    public static class Builder {
         private RestAdapter endpoint;
         private String apiKey;
 
@@ -59,11 +59,11 @@ public class Request {
         private Float searchRadius;
 
 
-        public RequestBuilder(String startDate) {
+        public Builder(String startDate) {
             this.startDate = startDate;
         }
 
-        public RequestBuilder(RequestBuilder builder) {
+        public Builder(Builder builder) {
             postcode = builder.postcode;
             lat = builder.lat;
             lon = builder.lon;
@@ -73,43 +73,43 @@ public class Request {
             searchRadius = builder.searchRadius;
         }
 
-        public RequestBuilder endpoint(RestAdapter endpoint) {
+        public Builder endpoint(RestAdapter endpoint) {
             this.endpoint = endpoint;
             return this;
         }
 
-        public RequestBuilder apiKey(String apiKey) {
+        public Builder apiKey(String apiKey) {
             this.apiKey = apiKey;
             return this;
         }
 
-        public RequestBuilder postcode(String postcode) {
+        public Builder postcode(String postcode) {
             this.postcode = postcode;
             return this;
         }
 
-        public RequestBuilder latlon(Float lat, Float lon) {
+        public Builder latlon(Float lat, Float lon) {
             this.lat = lat;
             this.lon = lon;
             return this;
         }
 
-        public RequestBuilder startDate(String startDate) {
+        public Builder startDate(String startDate) {
             this.startDate = startDate;
             return this;
         }
 
-        public RequestBuilder numDays(Integer numDays) {
+        public Builder numDays(Integer numDays) {
             this.numDays = numDays;
             return this;
         }
 
-        public RequestBuilder radiusUnit(RadiusUnit radiusUnit) {
+        public Builder radiusUnit(RadiusUnit radiusUnit) {
             this.radiusUnit = radiusUnit.getUnitString();
             return this;
         }
 
-        public RequestBuilder searchRadius(Float searchRadius) {
+        public Builder searchRadius(Float searchRadius) {
             this.searchRadius = searchRadius;
             return this;
         }

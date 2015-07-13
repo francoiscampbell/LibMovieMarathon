@@ -63,41 +63,6 @@ public class Main {
                                      .startsWith("q");
     }
 
-    private void printSchedules(List<Schedule> possibleSchedules) {
-        System.out.println(possibleSchedules.size() + " schedules generated:");
-
-        int i = 0;
-        for (Schedule schedule : possibleSchedules) {
-            i++;
-            System.out.println("Schedule " + i + " at " + schedule.getTheatre()
-                                                                  .getName() + ":");
-
-            Map<Showtime, Duration> delays = schedule.getDelays();
-            Duration minDelay = Collections.min(delays.values());
-            Duration maxDelay = Collections.max(delays.values());
-            Duration difference = maxDelay.minus(minDelay);
-
-            float[] redHsb = Color.RGBtoHSB(255, 0, 0, null);
-            float[] greenHsb = Color.RGBtoHSB(0, 255, 0, null);
-
-            for (Showtime showtime : schedule.getShowtimes()) {
-                System.out.println("\t" + showtime.toFriendlyString());
-                Duration delay = schedule.getDelayAfterShowtime(showtime);
-                if (delay != null) {
-                    float ratio = MoreMath.protectedDivide(delay.minus(minDelay)
-                                                                .getMillis(), difference.getMillis(), 1);
-                    float inverseRatio = 1 - ratio;
-                    float h = greenHsb[0] * ratio + redHsb[0] * inverseRatio;
-                    float s = greenHsb[1] * ratio + redHsb[1] * inverseRatio;
-                    float v = greenHsb[2] * ratio + redHsb[2] * inverseRatio;
-                    Color lerp = Color.getHSBColor(h, s, v);
-                    System.out.println("lerp = " + lerp);
-                    System.out.println("\tDelay of " + delay.getStandardMinutes() + " minutes");
-                }
-            }
-        }
-    }
-
     private void getMovies() {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
@@ -106,13 +71,14 @@ public class Main {
 
         String currentDate = LocalDate.now()
                                       .toString();
-        Request request = new Request.RequestBuilder(currentDate).endpoint(restAdapter)
-                                                                 .apiKey(API_KEY)
-                                                                 .postcode("M5T 1N5")
-                                                                 .radiusUnit(Request.RadiusUnit.KM)
-                                                                 .build();
+        Request request = new Request.Builder(currentDate).endpoint(restAdapter)
+                                                          .apiKey(API_KEY)
+                                                          .postcode("M5T 1N5")
+                                                          .radiusUnit(Request.RadiusUnit.KM)
+                                                          .build();
         List<ApiMovie> apiMovies = request.execute();
-        reorganizeMovies(apiMovies);
+        reorganizeMoviesIntoModel(apiMovies);
+        sortShowtimes();
     }
 
     /**
@@ -121,7 +87,7 @@ public class Main {
      *
      * @param apiMovieList The list of Movies as returned by the Gracenote API, converted by GSON
      */
-    private void reorganizeMovies(List<ApiMovie> apiMovieList) {
+    private void reorganizeMoviesIntoModel(List<ApiMovie> apiMovieList) {
         for (ApiMovie apiMovie : apiMovieList) {
             if (apiMovie.getRunTime() == null) {
                 continue; //null runtime events can't be planned (usually theatre events, etc)
@@ -190,6 +156,41 @@ public class Main {
             }
         }
         return null;
+    }
+
+    private void printSchedules(List<Schedule> possibleSchedules) {
+        System.out.println(possibleSchedules.size() + " schedules generated:");
+
+        int i = 0;
+        for (Schedule schedule : possibleSchedules) {
+            i++;
+            System.out.println("Schedule " + i + " at " + schedule.getTheatre()
+                                                                  .getName() + ":");
+
+            Map<Showtime, Duration> delays = schedule.getDelays();
+            Duration minDelay = Collections.min(delays.values());
+            Duration maxDelay = Collections.max(delays.values());
+            Duration difference = maxDelay.minus(minDelay);
+
+            float[] redHsb = Color.RGBtoHSB(255, 0, 0, null);
+            float[] greenHsb = Color.RGBtoHSB(0, 255, 0, null);
+
+            for (Showtime showtime : schedule.getShowtimes()) {
+                System.out.println("\t" + showtime.toFriendlyString());
+                Duration delay = schedule.getDelayAfterShowtime(showtime);
+                if (delay != null) {
+                    float ratio = MoreMath.protectedDivide(delay.minus(minDelay)
+                                                                .getMillis(), difference.getMillis(), 1);
+                    float inverseRatio = 1 - ratio;
+                    float h = greenHsb[0] * ratio + redHsb[0] * inverseRatio;
+                    float s = greenHsb[1] * ratio + redHsb[1] * inverseRatio;
+                    float v = greenHsb[2] * ratio + redHsb[2] * inverseRatio;
+                    Color lerp = Color.getHSBColor(h, s, v);
+                    System.out.println("lerp = " + lerp);
+                    System.out.println("\tDelay of " + delay.getStandardMinutes() + " minutes");
+                }
+            }
+        }
     }
 
 
