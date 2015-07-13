@@ -55,6 +55,11 @@ public class Theatre {
     }
 
     @Override
+    public int hashCode() {
+        return Integer.parseInt(id);
+    }
+
+    @Override
     public String toString() {
         return name;
     }

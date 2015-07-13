@@ -3,6 +3,7 @@ package io.github.francoiscampbell;
 import io.github.francoiscampbell.api.Request;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import io.github.francoiscampbell.apimodel.ApiShowtime;
+import io.github.francoiscampbell.collections.SelfMap;
 import io.github.francoiscampbell.model.Movie;
 import io.github.francoiscampbell.model.Schedule;
 import io.github.francoiscampbell.model.Showtime;
@@ -21,10 +22,8 @@ import java.util.List;
  */
 public class Main {
     private static final String API_URL = "http://data.tmsapi.com";
-    private static final String API_KM = "km";
-    private static final String API_MILES = "mi";
     private static final String API_KEY = "xv4za7trkge9yrz4b4h6ws9s";
-    private List<Theatre> allTheatres;
+    private SelfMap<Theatre> allTheatres;
     private List<Movie> allMovies;
 
     /**
@@ -33,19 +32,18 @@ public class Main {
      * TODO: Refactor to make this a proper application
      */
     public Main() {
-        allTheatres = new ArrayList<>();
+        allTheatres = new SelfMap<>();
         allMovies = new ArrayList<>();
     }
 
     public void start() {
         getMovies();
-        sortAllShowtimes();
         mainLoop();
     }
 
     private void mainLoop() {
         do {
-            List<Movie> desiredMovies = selectMoviesFromList(allMovies);
+            List<Movie> desiredMovies = selectMovies(allMovies);
             for (Theatre t : allTheatres) {
                 if (t.getMoviesPlayingHere()
                      .containsAll(desiredMovies)) {
@@ -119,7 +117,7 @@ public class Main {
 
     /**
      * Reorganizes the response from the Gracenote API from a movies->theatres->showtimes
-     * to theatres->showtimes format
+     * to theatres->showtimes->movies format
      *
      * @param apiMovieList The list of Movies as returned by the Gracenote API, converted by GSON
      */
@@ -131,15 +129,7 @@ public class Main {
             Movie movie = new Movie(apiMovie);
             allMovies.add(movie);
             for (ApiShowtime apiShowtime : apiMovie.getApiShowtimes()) {
-                //if the theatre is in the list, get it
-                //if it's not, add a new theatre to the list
-                Theatre theatre = new Theatre(apiShowtime.getApiTheatre());
-                if (allTheatres.contains(theatre)) {
-                    theatre = allTheatres.get(allTheatres.indexOf(theatre));
-                } else {
-                    allTheatres.add(theatre);
-                }
-
+                Theatre theatre = allTheatres.putIfAbsent(new Theatre(apiShowtime.getApiTheatre()));
                 Showtime showtime = new Showtime(apiShowtime, movie);
                 theatre.getShowtimes()
                        .add(showtime);
@@ -147,28 +137,13 @@ public class Main {
         }
     }
 
-    private void sortAllShowtimes() {
+    private void sortShowtimes() {
         for (Theatre t : allTheatres) {
-            sortShowtimes(t);
+            Collections.sort(t.getShowtimes());
         }
     }
 
-    private void sortShowtimes(Theatre theatre) {
-        Collections.sort(theatre.getShowtimes());
-    }
-
-    private Theatre selectTheatre(List<Theatre> theatres) {
-        System.out.println("Select theatre: ");
-        for (int i = 0; i < theatres.size(); i++) {
-            Theatre t = theatres.get(i);
-            System.out.println("\t" + i + ") " + t.getName());
-        }
-        Scanner s = new Scanner(System.in);
-        int selection = s.nextInt();
-        return theatres.get(selection);
-    }
-
-    private List<Movie> selectMoviesFromList(List<Movie> movies) {
+    private List<Movie> selectMovies(List<Movie> movies) {
         System.out.println("Select movie: ");
         for (int i = 0; i < movies.size(); i++) {
             Movie m = movies.get(i);
@@ -183,11 +158,6 @@ public class Main {
             desiredMovies.add(movies.get(selection));
         }
         return desiredMovies;
-    }
-
-
-    private List<Movie> selectMoviesFromTheatre(Theatre theatre) {
-        return selectMoviesFromList(theatre.getMoviesPlayingHere());
     }
 
     private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
