@@ -134,9 +134,9 @@ public class Main {
                 //if the theatre is in the list, get it
                 //if it's not, add a new theatre to the list
                 Theatre theatre = new Theatre(apiShowtime.getApiTheatre());
-                try {
+                if (allTheatres.contains(theatre)) {
                     theatre = allTheatres.get(allTheatres.indexOf(theatre));
-                } catch (IndexOutOfBoundsException e) {
+                } else {
                     allTheatres.add(theatre);
                 }
 
