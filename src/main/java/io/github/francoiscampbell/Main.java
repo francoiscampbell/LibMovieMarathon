@@ -7,6 +7,7 @@ import io.github.francoiscampbell.model.Movie;
 import io.github.francoiscampbell.model.Schedule;
 import io.github.francoiscampbell.model.Showtime;
 import io.github.francoiscampbell.model.Theatre;
+import javafx.util.Pair;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;
@@ -118,11 +119,17 @@ public class Main {
                                                       .getName());
         System.out.println("Starting progress dialog");
 
-        request.execute()
+        Observable<ApiMovie> apiMovies = request.execute()
                .flatMap(Observable::from)
-               .filter(apiMovie -> apiMovie.getRunTime() != null)
-               .map(Movie::new)
-               .subscribe(allMovies::add, Throwable::printStackTrace, this::sortAllShowtimes);
+                                                .filter(apiMovie -> apiMovie.getRunTime() != null);
+
+        Observable<Movie> movies = apiMovies.map(Movie::new);
+
+        Observable.combineLatest(apiMovies, movies, Pair::new);
+//               .doOnNext(allMovies::add)
+//               .flatMap(apiMovie -> Observable.from(apiMovie.getApiShowtimes()))
+//               .subscribe(System.out::println);
+//               .subscribe(movies::add, Throwable::printStackTrace, this::sortAllShowtimes);
     }
 
     /**
