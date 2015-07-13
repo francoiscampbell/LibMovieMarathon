@@ -45,8 +45,7 @@ public class Main {
         do {
             List<Movie> desiredMovies = selectMovies(allMovies);
             for (Theatre t : allTheatres) {
-                if (t.getMoviesPlayingHere()
-                     .containsAll(desiredMovies)) {
+                if (t.getMoviesPlayingHere().containsAll(desiredMovies)) {
                     List<Schedule> possibleSchedules = new ArrayList<>();
                     Deque<Showtime> currentPermutation = new LinkedList<>();
                     generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
