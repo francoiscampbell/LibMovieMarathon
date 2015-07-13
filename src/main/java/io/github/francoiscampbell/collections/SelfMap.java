@@ -1,11 +1,12 @@
 package io.github.francoiscampbell.collections;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * A Map that maps an item to itself to emulate a Set that you can get() from.
  */
-public class SelfMap<V> extends HashMap<V, V> {
+public class SelfMap<V> extends HashMap<V, V> implements Iterable<V> {
 
     /**
      * Puts the item in the SelfMap.
@@ -30,5 +31,10 @@ public class SelfMap<V> extends HashMap<V, V> {
             put(item);
         }
         return item;
+    }
+
+    @Override
+    public Iterator<V> iterator() {
+        return keySet().iterator();
     }
 }

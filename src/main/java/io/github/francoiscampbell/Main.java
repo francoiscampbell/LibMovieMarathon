@@ -19,15 +19,12 @@ import retrofit.client.Response;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by francois on 15-07-02.
  */
 public class Main {
     private static final String API_URL = "http://data.tmsapi.com";
-    private static final String API_KM = "km";
-    private static final String API_MILES = "mi";
     private static final String API_KEY = "xv4za7trkge9yrz4b4h6ws9s";
     private SelfMap<Theatre> allTheatres;
     private List<Movie> allMovies;
@@ -44,14 +41,13 @@ public class Main {
 
     public void start() {
         getMovies();
-        sortAllShowtimes();
         mainLoop();
     }
 
     private void mainLoop() {
         do {
-            List<Movie> desiredMovies = selectMoviesFromList(allMovies);
-            for (Theatre t : allTheatres.keySet()) {
+            List<Movie> desiredMovies = selectMovies(allMovies);
+            for (Theatre t : allTheatres) {
                 if (t.getMoviesPlayingHere()
                      .containsAll(desiredMovies)) {
                     List<Schedule> possibleSchedules = new ArrayList<>();
@@ -123,13 +119,15 @@ public class Main {
         //I know this is wrong, I just want to concentrate on
         //the actual response data for now
         //TODO: Make asynchronous, possibly using RxJava
-        final CountDownLatch cdl = new CountDownLatch(1);
+//        final CountDownLatch cdl = new CountDownLatch(1);
 
         request.execute(new Callback<List<ApiMovie>>() {
             @Override
             public void success(List<ApiMovie> apiMovieList, Response response) {
                 reorganizeMovies(apiMovieList);
-                cdl.countDown(); //count down the latch to unfreeze the main thread TODO: do it better
+                sortShowtimes();
+
+//                cdl.countDown(); //count down the latch to unfreeze the main thread TODO: do it better
             }
 
             @Override
@@ -138,17 +136,17 @@ public class Main {
             }
         });
 
-        try {
-            cdl.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            cdl.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
     /**
      * Reorganizes the response from the Gracenote API from a movies->theatres->showtimes
-     * to theatres->showtimes format
+     * to theatres->showtimes->movies format
      *
      * @param apiMovieList The list of Movies as returned by the Gracenote API, converted by GSON
      */
@@ -168,28 +166,13 @@ public class Main {
         }
     }
 
-    private void sortAllShowtimes() {
-        for (Theatre t : allTheatres.keySet()) {
-            sortShowtimes(t);
+    private void sortShowtimes() {
+        for (Theatre t : allTheatres) {
+            Collections.sort(t.getShowtimes());
         }
     }
 
-    private void sortShowtimes(Theatre theatre) {
-        Collections.sort(theatre.getShowtimes());
-    }
-
-    private Theatre selectTheatre(List<Theatre> theatres) {
-        System.out.println("Select theatre: ");
-        for (int i = 0; i < theatres.size(); i++) {
-            Theatre t = theatres.get(i);
-            System.out.println("\t" + i + ") " + t.getName());
-        }
-        Scanner s = new Scanner(System.in);
-        int selection = s.nextInt();
-        return theatres.get(selection);
-    }
-
-    private List<Movie> selectMoviesFromList(List<Movie> movies) {
+    private List<Movie> selectMovies(List<Movie> movies) {
         System.out.println("Select movie: ");
         for (int i = 0; i < movies.size(); i++) {
             Movie m = movies.get(i);
@@ -204,11 +187,6 @@ public class Main {
             desiredMovies.add(movies.get(selection));
         }
         return desiredMovies;
-    }
-
-
-    private List<Movie> selectMoviesFromTheatre(Theatre theatre) {
-        return selectMoviesFromList(theatre.getMoviesPlayingHere());
     }
 
     private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
