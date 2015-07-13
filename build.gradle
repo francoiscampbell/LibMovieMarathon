@@ -8,6 +8,9 @@ sourceCompatibility = 1.7
 
 repositories {
     mavenCentral()
+    maven {
+        url  "http://dl.bintray.com/francoiscampbell/maven"
+    }
 }
 
 dependencies {
@@ -15,4 +18,5 @@ dependencies {
     compile 'com.intellij:annotations:12.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'joda-time:joda-time:2.8.1'
+    compile 'io.github.francoiscampbell:more-math:0.1'
 }
