@@ -11,8 +11,9 @@ public class Showtime implements Comparable<Showtime> {
     private final DateTime dateTime;
     private final Movie movie;
 
-    public Showtime(String dateTime, Movie movie) {
-        this.dateTime = DateTime.parse(dateTime);
+    public Showtime(DateTime dateTime, Movie movie) {
+//        this.dateTime = DateTime.parse(dateTime);
+        this.dateTime = dateTime;
         this.movie = movie;
     }
 
@@ -54,5 +55,4 @@ public class Showtime implements Comparable<Showtime> {
     public String toFriendlyString() {
         return getStartTimeString() + "-" + getEndTimeString() + " " + getMovie().toString();
     }
-
 }

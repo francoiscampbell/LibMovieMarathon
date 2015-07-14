@@ -3,6 +3,7 @@ package io.github.francoiscampbell.apimodel;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import org.joda.time.DateTime;
 
 import javax.annotation.Generated;
 
@@ -13,11 +14,13 @@ public class ApiShowtime {
     @SerializedName("theatre")
     private ApiTheatre apiTheatre;
     @Expose
-    private String dateTime;
+    private DateTime dateTime;
     @Expose
     private String quals;
     @Expose
     private boolean barg;
+
+    private ApiMovie movie;
 
     /**
      * 
@@ -47,7 +50,7 @@ public class ApiShowtime {
      * @return
      *     The dateTime
      */
-    public String getDateTime() {
+    public DateTime getDateTime() {
         return dateTime;
     }
 
@@ -56,11 +59,11 @@ public class ApiShowtime {
      * @param dateTime
      *     The dateTime
      */
-    public void setDateTime(String dateTime) {
+    public void setDateTime(DateTime dateTime) {
         this.dateTime = dateTime;
     }
 
-    public ApiShowtime withDateTime(String dateTime) {
+    public ApiShowtime withDateTime(DateTime dateTime) {
         this.dateTime = dateTime;
         return this;
     }
@@ -109,6 +112,14 @@ public class ApiShowtime {
     public ApiShowtime withBarg(boolean barg) {
         this.barg = barg;
         return this;
+    }
+
+    public ApiMovie getMovie() {
+        return movie;
+    }
+
+    public void setMovie(ApiMovie movie) {
+        this.movie = movie;
     }
 
     @Override

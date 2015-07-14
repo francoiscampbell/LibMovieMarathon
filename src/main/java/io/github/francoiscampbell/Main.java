@@ -1,8 +1,11 @@
 package io.github.francoiscampbell;
 
+import com.fatboyindustrial.gsonjodatime.Converters;
+import com.google.gson.GsonBuilder;
 import io.github.francoiscampbell.api.Request;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import io.github.francoiscampbell.apimodel.ApiShowtime;
+import io.github.francoiscampbell.apimodel.ApiTheatre;
 import io.github.francoiscampbell.collections.SelfMap;
 import io.github.francoiscampbell.model.Movie;
 import io.github.francoiscampbell.model.Schedule;
@@ -12,6 +15,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;
 import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 
 import java.awt.*;
 import java.util.*;
@@ -63,9 +67,13 @@ public class Main {
     }
 
     private void getMovies() {
+        GsonBuilder builder = new GsonBuilder();
+        Converters.registerAll(builder).setDateFormat("yyyy-MM-DD'T'HH:MM");
+
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setEndpoint(API_URL)
+                .setConverter(new GsonConverter(builder.create()))
                 .build();
 
         String currentDate = LocalDate.now()
@@ -76,8 +84,8 @@ public class Main {
                                                           .radiusUnit(Request.RadiusUnit.KM)
                                                           .build();
         List<ApiMovie> apiMovies = request.execute();
-        reorganizeMoviesIntoModel(apiMovies);
-        sortShowtimes();
+        List<ApiTheatre> allTheatres = reorganizeMoviesIntoModel(apiMovies);
+        sortShowtimes(allTheatres);
     }
 
     /**
@@ -86,25 +94,34 @@ public class Main {
      *
      * @param apiMovieList The list of Movies as returned by the Gracenote API, converted by GSON
      */
-    private void reorganizeMoviesIntoModel(List<ApiMovie> apiMovieList) {
+    private List<ApiTheatre> reorganizeMoviesIntoModel(List<ApiMovie> apiMovieList) {
+//        List<ApiMovie> allMovies = new ArrayList<>();
+        SelfMap<ApiTheatre> allTheatres = new SelfMap<>();
+
         for (ApiMovie apiMovie : apiMovieList) {
             if (apiMovie.getRunTime() == null) {
                 continue; //null runtime events can't be planned (usually theatre events, etc)
             }
-            Movie movie = new Movie(apiMovie);
-            allMovies.add(movie);
+//            Movie movie = new Movie(apiMovie);
+//            allMovies.add(apiMovie);
             for (ApiShowtime apiShowtime : apiMovie.getApiShowtimes()) {
-                Theatre theatre = allTheatres.putIfAbsent(new Theatre(apiShowtime.getApiTheatre()));
-                Showtime showtime = new Showtime(apiShowtime, movie);
-                theatre.getShowtimes()
-                       .add(showtime);
+                apiShowtime.setMovie(apiMovie);
+
+
+                ApiTheatre apiTheatre = allTheatres.putIfAbsent(apiShowtime.getApiTheatre());
+                apiShowtime.setApiTheatre(apiTheatre);
+//                Showtime showtime = new Showtime(apiShowtime, movie);
+                apiTheatre.getShowtimes().add(apiShowtime);
+                apiShowtime.setApiTheatre(null);
             }
+            apiMovie.setApiShowtimes(null);
         }
+        return allTheatres.asList();
     }
 
-    private void sortShowtimes() {
-        for (Theatre t : allTheatres) {
-            Collections.sort(t.getShowtimes());
+    private void sortShowtimes(List<ApiTheatre> theatres) {
+        for (ApiTheatre t : theatres) {
+//            Collections.sort(t.getShowtimes());
         }
     }
 

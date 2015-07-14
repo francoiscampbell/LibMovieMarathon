@@ -4,6 +4,8 @@ package io.github.francoiscampbell.apimodel;
 import com.google.gson.annotations.Expose;
 
 import javax.annotation.Generated;
+import java.util.ArrayList;
+import java.util.List;
 
 @Generated("org.jsonschema2pojo")
 public class ApiTheatre {
@@ -12,6 +14,8 @@ public class ApiTheatre {
     private String id;
     @Expose
     private String name;
+
+    private List<ApiShowtime> showtimes = new ArrayList<>();
 
     /**
      * 
@@ -57,6 +61,10 @@ public class ApiTheatre {
     public ApiTheatre withName(String name) {
         this.name = name;
         return this;
+    }
+
+    public List<ApiShowtime> getShowtimes() {
+        return showtimes;
     }
 
     @Override

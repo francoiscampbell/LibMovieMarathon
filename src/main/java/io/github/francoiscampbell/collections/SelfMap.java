@@ -2,6 +2,8 @@ package io.github.francoiscampbell.collections;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A Map that maps an item to itself to emulate a Set that you can get() from.
@@ -31,6 +33,10 @@ public class SelfMap<V> extends HashMap<V, V> implements Iterable<V> {
             put(item);
         }
         return item;
+    }
+
+    public List<V> asList() {
+        return new LinkedList<>(keySet());
     }
 
     @Override
