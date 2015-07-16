@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class Main {
     private static final String API_URL = "http://data.tmsapi.com";
-    private static final String API_KEY = "xv4za7trkge9yrz4b4h6ws9s";
+
     private SelfMap<Theatre> allTheatres;
     private List<Movie> allMovies;
 
@@ -79,7 +79,7 @@ public class Main {
         String currentDate = LocalDate.now()
                                       .toString();
         Request request = new Request.Builder(currentDate).endpoint(restAdapter)
-                                                          .apiKey(API_KEY)
+                                                          .apiKey(ApiKey.API_KEY)
                 .postcode("m5t1n5")
 //                                                          .radiusUnit(Request.RadiusUnit.KM)
                                                           .build();
