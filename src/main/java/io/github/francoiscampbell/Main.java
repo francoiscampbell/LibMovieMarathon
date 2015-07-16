@@ -80,8 +80,8 @@ public class Main {
                                       .toString();
         Request request = new Request.Builder(currentDate).endpoint(restAdapter)
                                                           .apiKey(API_KEY)
-                                                          .postcode("M5T 1N5")
-                                                          .radiusUnit(Request.RadiusUnit.KM)
+                .postcode("m5t1n5")
+//                                                          .radiusUnit(Request.RadiusUnit.KM)
                                                           .build();
         List<ApiMovie> apiMovies = request.execute();
         List<ApiTheatre> allTheatres = reorganizeMoviesIntoModel(apiMovies);

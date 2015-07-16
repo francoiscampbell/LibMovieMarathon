@@ -3,74 +3,39 @@ package io.github.francoiscampbell.api;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import retrofit.RestAdapter;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by francois on 15-07-10.
  */
 public class Request {
     private RestAdapter endpoint;
-    private String apiKey;
-
-    private String postcode;
-    private Float lat;
-    private Float lon;
-    private String startDate;
-    private Integer numDays;
-    private String radiusUnit;
-    private Float searchRadius;
+    private Map<String, String> queryParams;
 
     private Request(Builder builder) {
         endpoint = builder.endpoint;
-        apiKey = builder.apiKey;
-
-        postcode = builder.postcode;
-        lat = builder.lat;
-        lon = builder.lon;
-        startDate = builder.startDate;
-        numDays = builder.numDays;
-        radiusUnit = builder.radiusUnit;
-        searchRadius = builder.searchRadius;
+        this.queryParams = builder.queryParams;
     }
 
     public List<ApiMovie> execute() {
         MovieApi api = endpoint.create(MovieApi.class);
-        return api.getMovies(
-                startDate, //date
-                numDays, //num days (default 1 if null)
-                postcode,
-                lat, //latitude (not needed if using postcode)
-                lon, //longitude (not needed if using postcode)
-                searchRadius, //radius (default 5 if null)
-                radiusUnit, //radius unit (default miles if null)
-                apiKey);
+        return api.getMovies(queryParams);
     }
 
     public static class Builder {
         private RestAdapter endpoint;
-        private String apiKey;
-
-        private String postcode;
-        private Float lat;
-        private Float lon;
-        private String startDate;
-        private Integer numDays;
-        private String radiusUnit;
-        private Float searchRadius;
+        private Map<String, String> queryParams;
 
 
         public Builder(String startDate) {
-            this.startDate = startDate;
+            queryParams = new HashMap<>();
+            queryParams.put("startDate", startDate);
         }
 
         public Builder(Builder builder) {
-            postcode = builder.postcode;
-            lat = builder.lat;
-            lon = builder.lon;
-            startDate = builder.startDate;
-            numDays = builder.numDays;
-            radiusUnit = builder.radiusUnit;
-            searchRadius = builder.searchRadius;
+            this.queryParams = builder.queryParams;
         }
 
         public Builder endpoint(RestAdapter endpoint) {
@@ -79,38 +44,38 @@ public class Request {
         }
 
         public Builder apiKey(String apiKey) {
-            this.apiKey = apiKey;
+            queryParams.put("api_key", apiKey);
             return this;
         }
 
         public Builder postcode(String postcode) {
-            this.postcode = postcode;
+            queryParams.put("zip", postcode);
             return this;
         }
 
-        public Builder latlon(Float lat, Float lon) {
-            this.lat = lat;
-            this.lon = lon;
+        public Builder latlon(float lat, float lon) {
+            queryParams.put("lat", String.valueOf(lat));
+            queryParams.put("lon", String.valueOf(lon));
             return this;
         }
 
         public Builder startDate(String startDate) {
-            this.startDate = startDate;
+            queryParams.put("startDate", startDate);
             return this;
         }
 
-        public Builder numDays(Integer numDays) {
-            this.numDays = numDays;
+        public Builder numDays(int numDays) {
+            queryParams.put("numDays", String.valueOf(numDays));
             return this;
         }
 
         public Builder radiusUnit(RadiusUnit radiusUnit) {
-            this.radiusUnit = radiusUnit.getUnitString();
+            queryParams.put("units", radiusUnit.getUnitString());
             return this;
         }
 
-        public Builder searchRadius(Float searchRadius) {
-            this.searchRadius = searchRadius;
+        public Builder searchRadius(float searchRadius) {
+            queryParams.put("radius", String.valueOf(searchRadius));
             return this;
         }
 
