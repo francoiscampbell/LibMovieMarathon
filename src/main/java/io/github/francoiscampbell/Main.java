@@ -63,7 +63,7 @@ public class Main {
     private boolean quit() {
         System.out.println("Type 'q' to quit");
         return new Scanner(System.in).next()
-                                     .startsWith("q");
+                .startsWith("q");
     }
 
     private void getMovies() {
@@ -77,12 +77,12 @@ public class Main {
                 .build();
 
         String currentDate = LocalDate.now()
-                                      .toString();
+                .toString();
         Request request = new Request.Builder(currentDate).endpoint(restAdapter)
-                                                          .apiKey(ApiKey.API_KEY)
+                .apiKey(ApiKey.API_KEY)
                 .postcode("m5t1n5")
-//                                                          .radiusUnit(Request.RadiusUnit.KM)
-                                                          .build();
+//                .radiusUnit(Request.RadiusUnit.KM)
+                .build();
         List<ApiMovie> apiMovies = request.execute();
         List<ApiTheatre> allTheatres = reorganizeMoviesIntoModel(apiMovies);
         sortShowtimes(allTheatres);
@@ -155,7 +155,7 @@ public class Main {
                 List<Movie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
                 nextAvailableStartTime = showtime.getStartDateTime()
-                                                 .plus(movie.getTotalLength());
+                        .plus(movie.getTotalLength());
                 generateSchedule(theatre, remainingMovies, nextAvailableStartTime, possibleSchedules, currentPermutation);
                 currentPermutation.removeLast();
             }
@@ -167,7 +167,7 @@ public class Main {
         for (Showtime showtime : theatre.getShowtimes()) {
             DateTime dateTime = showtime.getStartDateTime();
             if (showtime.getMovie()
-                        .equals(movie) && dateTime.isAfter(startTime)) {
+                    .equals(movie) && dateTime.isAfter(startTime)) {
                 return showtime;
             }
         }
@@ -181,7 +181,7 @@ public class Main {
         for (Schedule schedule : possibleSchedules) {
             i++;
             System.out.println("Schedule " + i + " at " + schedule.getTheatre()
-                                                                  .getName() + ":");
+                    .getName() + ":");
 
             Map<Showtime, Duration> delays = schedule.getDelays();
             Duration minDelay = Collections.min(delays.values());
@@ -196,7 +196,7 @@ public class Main {
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
                 if (delay != null) {
                     float ratio = MoreMath.protectedDivide(delay.minus(minDelay)
-                                                                .getMillis(), difference.getMillis(), 1);
+                            .getMillis(), difference.getMillis(), 1);
                     float inverseRatio = 1 - ratio;
                     float h = greenHsb[0] * ratio + redHsb[0] * inverseRatio;
                     float s = greenHsb[1] * ratio + redHsb[1] * inverseRatio;
