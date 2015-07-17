@@ -3,6 +3,8 @@ package io.github.francoiscampbell.apimodel;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import javax.annotation.Generated;
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ public class ApiMovie {
     @Expose
     private int releaseYear;
     @Expose
-    private String releaseDate;
+    private DateTime releaseDate;
     @Expose
     private String titleLang;
     @Expose
@@ -50,7 +52,7 @@ public class ApiMovie {
     @Expose
     private List<String> advisories = new ArrayList<String>();
     @Expose
-    private String runTime;
+    private Duration runTime;
     @Expose
     @SerializedName("preferredImage")
     private ApiPreferredImage apiPreferredImage;
@@ -539,6 +541,11 @@ public class ApiMovie {
     public ApiMovie withShowtimes(List<ApiShowtime> apiShowtimes) {
         this.apiShowtimes = apiShowtimes;
         return this;
+    }
+
+    //TODO: change to calculate actual duration
+    public Duration getTotalLength(){
+        return new Duration(1000 * 60 * 60);
     }
 
     @Override

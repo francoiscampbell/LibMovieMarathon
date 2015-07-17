@@ -3,12 +3,13 @@ package io.github.francoiscampbell.apimodel;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class ApiShowtime {
+public class ApiShowtime implements Comparable<ApiShowtime> {
 
     @Expose
     @SerializedName("theatre")
@@ -120,6 +121,37 @@ public class ApiShowtime {
 
     public void setMovie(ApiMovie movie) {
         this.movie = movie;
+    }
+
+    public DateTime getStartDateTime() {
+        return dateTime;
+    }
+
+    public DateTime getEndDateTime() {
+        return dateTime.plus(getMovie().getTotalLength());
+    }
+
+    public String getStartTimeString() {
+        return String.format("%02d:%02d", dateTime.getHourOfDay(), dateTime.getMinuteOfHour());
+    }
+
+    public String getEndTimeString() {
+        DateTime endTime = getEndDateTime();
+        return String.format("%02d:%02d", endTime.getHourOfDay(), endTime.getMinuteOfHour());
+    }
+
+    @Override
+    public int compareTo(@NotNull ApiShowtime o) {
+        return dateTime.compareTo(o.getStartDateTime());
+    }
+
+    @Override
+    public String toString() {
+        return dateTime.toString() + "-" + getEndDateTime().toString() + " " + getMovie().toString();
+    }
+
+    public String toFriendlyString() {
+        return getStartTimeString() + "-" + getEndTimeString() + " " + getMovie().toString();
     }
 
     @Override

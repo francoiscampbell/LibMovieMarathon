@@ -5,7 +5,9 @@ import com.google.gson.annotations.Expose;
 
 import javax.annotation.Generated;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Generated("org.jsonschema2pojo")
 public class ApiTheatre {
@@ -18,18 +20,14 @@ public class ApiTheatre {
     private List<ApiShowtime> showtimes = new ArrayList<>();
 
     /**
-     * 
-     * @return
-     *     The id
+     * @return The id
      */
     public String getId() {
         return id;
     }
 
     /**
-     * 
-     * @param id
-     *     The id
+     * @param id The id
      */
     public void setId(String id) {
         this.id = id;
@@ -41,18 +39,14 @@ public class ApiTheatre {
     }
 
     /**
-     * 
-     * @return
-     *     The name
+     * @return The name
      */
     public String getName() {
         return name;
     }
 
     /**
-     * 
-     * @param name
-     *     The name
+     * @param name The name
      */
     public void setName(String name) {
         this.name = name;
@@ -65,6 +59,14 @@ public class ApiTheatre {
 
     public List<ApiShowtime> getShowtimes() {
         return showtimes;
+    }
+
+    public Set<ApiMovie> getMoviesPlayingHere() {
+        Set<ApiMovie> movies = new HashSet<>();
+        for (ApiShowtime s : showtimes) {
+            movies.add(s.getMovie());
+        }
+        return movies;
     }
 
     @Override
