@@ -48,14 +48,15 @@ public class Main {
     private void mainLoop() {
         do {
             List<ApiMovie> desiredMovies = selectMovies(allMovies);
+            List<Schedule> possibleSchedules = new ArrayList<>();
+            Deque<ApiShowtime> currentPermutation = new LinkedList<>();
             for (ApiTheatre t : allTheatres) {
                 if (t.getMoviesPlayingHere().containsAll(desiredMovies)) {
-                    List<Schedule> possibleSchedules = new ArrayList<>();
-                    Deque<ApiShowtime> currentPermutation = new LinkedList<>();
                     generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
-                    printSchedules(possibleSchedules);
                 }
             }
+            Collections.sort(possibleSchedules, (o1, o2) -> o1.getTotalDelay().compareTo(o2.getTotalDelay()));
+            printSchedules(possibleSchedules);
         } while (!quit());
     }
 
@@ -83,10 +84,10 @@ public class Main {
                 .postcode("M5T1N5")
 //                .radiusUnit(Request.RadiusUnit.KM)
                 .build();
-//        List<ApiMovie> apiMovies = request.execute();
+
         allMovies = request.execute();
-        List<ApiTheatre> allTheatres = reorganizeMoviesIntoModel();
-        sortShowtimes(allTheatres);
+        reorganizeMoviesIntoModel();
+        sortShowtimes();
     }
 
     /**
@@ -111,9 +112,9 @@ public class Main {
         return allTheatres.asList();
     }
 
-    private void sortShowtimes(List<ApiTheatre> theatres) {
-        for (ApiTheatre t : theatres) {
-//            Collections.sort(t.getShowtimes());
+    private void sortShowtimes() {
+        for (ApiTheatre t : allTheatres) {
+            Collections.sort(t.getShowtimes());
         }
     }
 
@@ -154,7 +155,6 @@ public class Main {
                 currentPermutation.removeLast();
             }
         }
-
     }
 
     private ApiShowtime findNextShowtimeForMovie(ApiTheatre theatre, ApiMovie movie, DateTime startTime) {
@@ -178,9 +178,18 @@ public class Main {
                                                                   .getName() + ":");
 
             Map<ApiShowtime, Duration> delays = schedule.getDelays();
-            Duration minDelay = Collections.min(delays.values());
-            Duration maxDelay = Collections.max(delays.values());
-            Duration difference = maxDelay.minus(minDelay);
+            Duration minDelay;
+            Duration maxDelay;
+            Duration difference;
+            if (delays.size() > 0) {
+                minDelay = Collections.min(delays.values());
+                maxDelay = Collections.max(delays.values());
+            } else {
+                minDelay = new Duration(0);
+                maxDelay = new Duration(0);
+            }
+            difference = maxDelay.minus(minDelay);
+
 
             float[] redHsb = Color.RGBtoHSB(255, 0, 0, null);
             float[] greenHsb = Color.RGBtoHSB(0, 255, 0, null);
@@ -196,7 +205,7 @@ public class Main {
                     float s = greenHsb[1] * ratio + redHsb[1] * inverseRatio;
                     float v = greenHsb[2] * ratio + redHsb[2] * inverseRatio;
                     Color lerp = Color.getHSBColor(h, s, v);
-                    System.out.println("lerp = " + lerp);
+//                    System.out.println("lerp = " + lerp);
                     System.out.println("\tDelay of " + delay.getStandardMinutes() + " minutes");
                 }
             }

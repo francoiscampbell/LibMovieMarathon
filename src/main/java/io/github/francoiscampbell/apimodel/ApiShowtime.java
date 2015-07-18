@@ -169,7 +169,7 @@ public class ApiShowtime implements Comparable<ApiShowtime> {
 
     @Override
     public int hashCode() {
-        int result = apiTheatre.hashCode();
+        int result = movie.hashCode();
         result = 31 * result + dateTime.hashCode();
         return result;
     }

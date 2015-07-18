@@ -14,11 +14,13 @@ public class Schedule {
     private ApiTheatre theatre;
     private Deque<ApiShowtime> showtimes;
     private Map<ApiShowtime, Duration> delays;
+    private Duration totalDelay;
 
     public Schedule(Deque<ApiShowtime> showtimes, ApiTheatre theatre) {
         this.showtimes = new LinkedList<>(showtimes);
         this.theatre = theatre;
         this.delays = calculateDelays(showtimes);
+        this.totalDelay = calculateTotalDelay();
     }
 
     private Map<ApiShowtime, Duration> calculateDelays(Deque<ApiShowtime> showtimes) {
@@ -35,8 +37,20 @@ public class Schedule {
         return delays;
     }
 
+    private Duration calculateTotalDelay() {
+        Duration totalDelay = new Duration(0);
+        for (Duration delay : delays.values()) {
+            totalDelay = totalDelay.plus(delay);
+        }
+        return totalDelay;
+    }
+
     public Map<ApiShowtime, Duration> getDelays() {
         return delays;
+    }
+
+    public Duration getTotalDelay() {
+        return totalDelay;
     }
 
     public Duration getDelayAfterShowtime(ApiShowtime showtime) {

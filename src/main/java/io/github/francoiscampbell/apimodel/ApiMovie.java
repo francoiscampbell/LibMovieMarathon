@@ -9,6 +9,7 @@ import org.joda.time.Duration;
 import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Generated("org.jsonschema2pojo")
 public class ApiMovie {
@@ -60,19 +61,17 @@ public class ApiMovie {
     @SerializedName("showtimes")
     private List<ApiShowtime> apiShowtimes = new ArrayList<>();
 
+    private Duration previewsLength = Duration.standardMinutes(15); //hardcoded previews length to 15
+
     /**
-     * 
-     * @return
-     *     The tmsId
+     * @return The tmsId
      */
     public String getTmsId() {
         return tmsId;
     }
 
     /**
-     * 
-     * @param tmsId
-     *     The tmsId
+     * @param tmsId The tmsId
      */
     public void setTmsId(String tmsId) {
         this.tmsId = tmsId;
@@ -84,18 +83,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The rootId
+     * @return The rootId
      */
     public String getRootId() {
         return rootId;
     }
 
     /**
-     * 
-     * @param rootId
-     *     The rootId
+     * @param rootId The rootId
      */
     public void setRootId(String rootId) {
         this.rootId = rootId;
@@ -107,18 +102,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The subType
+     * @return The subType
      */
     public String getSubType() {
         return subType;
     }
 
     /**
-     * 
-     * @param subType
-     *     The subType
+     * @param subType The subType
      */
     public void setSubType(String subType) {
         this.subType = subType;
@@ -130,18 +121,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The title
+     * @return The title
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * 
-     * @param title
-     *     The title
+     * @param title The title
      */
     public void setTitle(String title) {
         this.title = title;
@@ -153,18 +140,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The releaseYear
+     * @return The releaseYear
      */
     public int getReleaseYear() {
         return releaseYear;
     }
 
     /**
-     * 
-     * @param releaseYear
-     *     The releaseYear
+     * @param releaseYear The releaseYear
      */
     public void setReleaseYear(int releaseYear) {
         this.releaseYear = releaseYear;
@@ -176,18 +159,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The releaseDate
+     * @return The releaseDate
      */
     public DateTime getReleaseDate() {
         return releaseDate;
     }
 
     /**
-     * 
-     * @param releaseDate
-     *     The releaseDate
+     * @param releaseDate The releaseDate
      */
     public void setReleaseDate(DateTime releaseDate) {
         this.releaseDate = releaseDate;
@@ -199,18 +178,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The titleLang
+     * @return The titleLang
      */
     public String getTitleLang() {
         return titleLang;
     }
 
     /**
-     * 
-     * @param titleLang
-     *     The titleLang
+     * @param titleLang The titleLang
      */
     public void setTitleLang(String titleLang) {
         this.titleLang = titleLang;
@@ -222,18 +197,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The descriptionLang
+     * @return The descriptionLang
      */
     public String getDescriptionLang() {
         return descriptionLang;
     }
 
     /**
-     * 
-     * @param descriptionLang
-     *     The descriptionLang
+     * @param descriptionLang The descriptionLang
      */
     public void setDescriptionLang(String descriptionLang) {
         this.descriptionLang = descriptionLang;
@@ -245,18 +216,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The entityType
+     * @return The entityType
      */
     public String getEntityType() {
         return entityType;
     }
 
     /**
-     * 
-     * @param entityType
-     *     The entityType
+     * @param entityType The entityType
      */
     public void setEntityType(String entityType) {
         this.entityType = entityType;
@@ -268,18 +235,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The genres
+     * @return The genres
      */
     public List<String> getGenres() {
         return genres;
     }
 
     /**
-     * 
-     * @param genres
-     *     The genres
+     * @param genres The genres
      */
     public void setGenres(List<String> genres) {
         this.genres = genres;
@@ -291,18 +254,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The longDescription
+     * @return The longDescription
      */
     public String getLongDescription() {
         return longDescription;
     }
 
     /**
-     * 
-     * @param longDescription
-     *     The longDescription
+     * @param longDescription The longDescription
      */
     public void setLongDescription(String longDescription) {
         this.longDescription = longDescription;
@@ -314,18 +273,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The shortDescription
+     * @return The shortDescription
      */
     public String getShortDescription() {
         return shortDescription;
     }
 
     /**
-     * 
-     * @param shortDescription
-     *     The shortDescription
+     * @param shortDescription The shortDescription
      */
     public void setShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
@@ -337,18 +292,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The topCast
+     * @return The topCast
      */
     public List<String> getTopCast() {
         return topCast;
     }
 
     /**
-     * 
-     * @param topCast
-     *     The topCast
+     * @param topCast The topCast
      */
     public void setTopCast(List<String> topCast) {
         this.topCast = topCast;
@@ -360,18 +311,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The directors
+     * @return The directors
      */
     public List<String> getDirectors() {
         return directors;
     }
 
     /**
-     * 
-     * @param directors
-     *     The directors
+     * @param directors The directors
      */
     public void setDirectors(List<String> directors) {
         this.directors = directors;
@@ -383,18 +330,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The officialUrl
+     * @return The officialUrl
      */
     public String getOfficialUrl() {
         return officialUrl;
     }
 
     /**
-     * 
-     * @param officialUrl
-     *     The officialUrl
+     * @param officialUrl The officialUrl
      */
     public void setOfficialUrl(String officialUrl) {
         this.officialUrl = officialUrl;
@@ -406,18 +349,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The apiQualityRating
+     * @return The apiQualityRating
      */
     public ApiQualityRating getApiQualityRating() {
         return apiQualityRating;
     }
 
     /**
-     * 
-     * @param apiQualityRating
-     *     The apiQualityRating
+     * @param apiQualityRating The apiQualityRating
      */
     public void setApiQualityRating(ApiQualityRating apiQualityRating) {
         this.apiQualityRating = apiQualityRating;
@@ -429,18 +368,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The apiRatings
+     * @return The apiRatings
      */
     public List<ApiRating> getApiRatings() {
         return apiRatings;
     }
 
     /**
-     * 
-     * @param apiRatings
-     *     The apiRatings
+     * @param apiRatings The apiRatings
      */
     public void setApiRatings(List<ApiRating> apiRatings) {
         this.apiRatings = apiRatings;
@@ -452,18 +387,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The advisories
+     * @return The advisories
      */
     public List<String> getAdvisories() {
         return advisories;
     }
 
     /**
-     * 
-     * @param advisories
-     *     The advisories
+     * @param advisories The advisories
      */
     public void setAdvisories(List<String> advisories) {
         this.advisories = advisories;
@@ -475,18 +406,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The runTime
+     * @return The runTime
      */
     public Duration getRunTime() {
         return runTime;
     }
 
     /**
-     * 
-     * @param runTime
-     *     The runTime
+     * @param runTime The runTime
      */
     public void setRunTime(Duration runTime) {
         this.runTime = runTime;
@@ -498,18 +425,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The apiPreferredImage
+     * @return The apiPreferredImage
      */
     public ApiPreferredImage getApiPreferredImage() {
         return apiPreferredImage;
     }
 
     /**
-     * 
-     * @param apiPreferredImage
-     *     The apiPreferredImage
+     * @param apiPreferredImage The apiPreferredImage
      */
     public void setApiPreferredImage(ApiPreferredImage apiPreferredImage) {
         this.apiPreferredImage = apiPreferredImage;
@@ -521,18 +444,14 @@ public class ApiMovie {
     }
 
     /**
-     * 
-     * @return
-     *     The apiShowtimes
+     * @return The apiShowtimes
      */
     public List<ApiShowtime> getApiShowtimes() {
         return apiShowtimes;
     }
 
     /**
-     * 
-     * @param apiShowtimes
-     *     The apiShowtimes
+     * @param apiShowtimes The apiShowtimes
      */
     public void setApiShowtimes(List<ApiShowtime> apiShowtimes) {
         this.apiShowtimes = apiShowtimes;
@@ -543,9 +462,17 @@ public class ApiMovie {
         return this;
     }
 
-    //TODO: change to calculate actual duration
-    public Duration getTotalLength(){
-        return new Duration(1000 * 60 * 60);
+    public Duration getPreviewsLength() {
+        return previewsLength;
+    }
+
+    public Duration getTotalLength() {
+        return getRunTime().plus(getPreviewsLength());
+    }
+
+    @Override
+    public String toString() {
+        return title;
     }
 
     @Override
@@ -555,9 +482,7 @@ public class ApiMovie {
 
         ApiMovie apiMovie = (ApiMovie) o;
 
-        if (!tmsId.equals(apiMovie.tmsId)) return false;
-
-        return true;
+        return Objects.equals(tmsId, apiMovie.tmsId);
     }
 
     @Override
