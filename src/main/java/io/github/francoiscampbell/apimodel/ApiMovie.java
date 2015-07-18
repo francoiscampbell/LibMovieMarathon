@@ -32,15 +32,15 @@ public class ApiMovie {
     @Expose
     private String entityType;
     @Expose
-    private List<String> genres = new ArrayList<String>();
+    private List<String> genres = new ArrayList<>();
     @Expose
     private String longDescription;
     @Expose
     private String shortDescription;
     @Expose
-    private List<String> topCast = new ArrayList<String>();
+    private List<String> topCast = new ArrayList<>();
     @Expose
-    private List<String> directors = new ArrayList<String>();
+    private List<String> directors = new ArrayList<>();
     @Expose
     private String officialUrl;
     @Expose
@@ -48,9 +48,9 @@ public class ApiMovie {
     private ApiQualityRating apiQualityRating;
     @Expose
     @SerializedName("ratings")
-    private List<ApiRating> apiRatings = new ArrayList<ApiRating>();
+    private List<ApiRating> apiRatings = new ArrayList<>();
     @Expose
-    private List<String> advisories = new ArrayList<String>();
+    private List<String> advisories = new ArrayList<>();
     @Expose
     private Duration runTime;
     @Expose
@@ -58,7 +58,7 @@ public class ApiMovie {
     private ApiPreferredImage apiPreferredImage;
     @Expose
     @SerializedName("showtimes")
-    private List<ApiShowtime> apiShowtimes = new ArrayList<ApiShowtime>();
+    private List<ApiShowtime> apiShowtimes = new ArrayList<>();
 
     /**
      * 
@@ -180,7 +180,7 @@ public class ApiMovie {
      * @return
      *     The releaseDate
      */
-    public String getReleaseDate() {
+    public DateTime getReleaseDate() {
         return releaseDate;
     }
 
@@ -189,11 +189,11 @@ public class ApiMovie {
      * @param releaseDate
      *     The releaseDate
      */
-    public void setReleaseDate(String releaseDate) {
+    public void setReleaseDate(DateTime releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    public ApiMovie withReleaseDate(String releaseDate) {
+    public ApiMovie withReleaseDate(DateTime releaseDate) {
         this.releaseDate = releaseDate;
         return this;
     }
@@ -479,7 +479,7 @@ public class ApiMovie {
      * @return
      *     The runTime
      */
-    public String getRunTime() {
+    public Duration getRunTime() {
         return runTime;
     }
 
@@ -488,11 +488,11 @@ public class ApiMovie {
      * @param runTime
      *     The runTime
      */
-    public void setRunTime(String runTime) {
+    public void setRunTime(Duration runTime) {
         this.runTime = runTime;
     }
 
-    public ApiMovie withRunTime(String runTime) {
+    public ApiMovie withRunTime(Duration runTime) {
         this.runTime = runTime;
         return this;
     }

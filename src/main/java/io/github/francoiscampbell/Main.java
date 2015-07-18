@@ -1,5 +1,6 @@
 package io.github.francoiscampbell;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.francoiscampbell.api.ApiKey;
 import io.github.francoiscampbell.api.Request;
@@ -8,6 +9,7 @@ import io.github.francoiscampbell.apimodel.ApiShowtime;
 import io.github.francoiscampbell.apimodel.ApiTheatre;
 import io.github.francoiscampbell.collections.SelfMap;
 import io.github.francoiscampbell.gson.DateTimeConverter;
+import io.github.francoiscampbell.gson.DurationConverter;
 import io.github.francoiscampbell.model.Schedule;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -61,23 +63,23 @@ public class Main {
     private boolean quit() {
         System.out.println("Type 'q' to quit");
         return new Scanner(System.in).next()
-                .startsWith("q");
+                                     .startsWith("q");
     }
 
     private void getMovies() {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(DateTime.class, new DateTimeConverter());
+        Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new DateTimeConverter())
+                                     .registerTypeAdapter(Duration.class, new DurationConverter())
+                                     .create();
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setEndpoint(API_URL)
-                .setConverter(new GsonConverter(builder.create()))
+                .setConverter(new GsonConverter(gson))
                 .build();
 
-        String currentDate = LocalDate.now()
-                .toString();
+        String currentDate = LocalDate.now().toString();
         Request request = new Request.Builder(currentDate).endpoint(restAdapter)
-                .apiKey(ApiKey.API_KEY)
+                                                          .apiKey(ApiKey.API_KEY)
                 .postcode("M5T1N5")
 //                .radiusUnit(Request.RadiusUnit.KM)
                 .build();
@@ -118,7 +120,7 @@ public class Main {
     private List<ApiMovie> selectMovies(List<ApiMovie> movies) {
         System.out.println("Select movie: ");
         int i = 0;
-        for (ApiMovie m : movies){
+        for (ApiMovie m : movies) {
             i++;
             System.out.println("\t" + i + ") " + m.getTitle());
 
@@ -147,7 +149,7 @@ public class Main {
                 List<ApiMovie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
                 nextAvailableStartTime = showtime.getStartDateTime()
-                        .plus(movie.getTotalLength());
+                                                 .plus(movie.getTotalLength());
                 generateSchedule(theatre, remainingMovies, nextAvailableStartTime, possibleSchedules, currentPermutation);
                 currentPermutation.removeLast();
             }
@@ -159,7 +161,7 @@ public class Main {
         for (ApiShowtime showtime : theatre.getShowtimes()) {
             DateTime dateTime = showtime.getStartDateTime();
             if (showtime.getMovie()
-                    .equals(movie) && dateTime.isAfter(startTime)) {
+                        .equals(movie) && dateTime.isAfter(startTime)) {
                 return showtime;
             }
         }
@@ -173,7 +175,7 @@ public class Main {
         for (Schedule schedule : possibleSchedules) {
             i++;
             System.out.println("Schedule " + i + " at " + schedule.getTheatre()
-                    .getName() + ":");
+                                                                  .getName() + ":");
 
             Map<ApiShowtime, Duration> delays = schedule.getDelays();
             Duration minDelay = Collections.min(delays.values());
@@ -188,7 +190,7 @@ public class Main {
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
                 if (delay != null) {
                     float ratio = MoreMath.protectedDivide(delay.minus(minDelay)
-                            .getMillis(), difference.getMillis(), 1);
+                                                                .getMillis(), difference.getMillis(), 1);
                     float inverseRatio = 1 - ratio;
                     float h = greenHsb[0] * ratio + redHsb[0] * inverseRatio;
                     float s = greenHsb[1] * ratio + redHsb[1] * inverseRatio;
