@@ -94,22 +94,22 @@ public class Main {
      * Reorganizes the response from the Gracenote API from a movies->theatres->showtimes
      * to theatres->showtimes->movies format
      */
-    private List<ApiTheatre> reorganizeMoviesIntoModel() {
-//        List<ApiMovie> allMovies = new ArrayList<>();
-        for (ApiMovie apiMovie : allMovies) {
+    private void reorganizeMoviesIntoModel() {
+        for (Iterator<ApiMovie> iterator = allMovies.iterator(); iterator.hasNext(); ) {
+            ApiMovie apiMovie = iterator.next();
             if (apiMovie.getRunTime() == null) {
-                continue; //null runtime events can't be planned (usually theatre events, etc)
+                iterator.remove(); //null runtime events can't be planned (usually theatre events, etc)
             }
             for (ApiShowtime apiShowtime : apiMovie.getApiShowtimes()) {
-                apiShowtime.setMovie(apiMovie);
-                ApiTheatre apiTheatre = allTheatres.putIfAbsent(apiShowtime.getApiTheatre());
-                apiTheatre.getShowtimes().add(apiShowtime);
+                apiShowtime.setMovie(apiMovie); //set the movie to be a child of the showtime
+                ApiTheatre apiTheatre = allTheatres.putIfAbsent(apiShowtime
+                        .getApiTheatre()); //reduce identical object duplication by getting the copy if it exists in the SelfMap of theratres
+                apiTheatre.getShowtimes().add(apiShowtime); //add the showtime to the showtimes for this theatre
 
-                apiShowtime.setApiTheatre(null);
+                apiShowtime.setApiTheatre(null); //remove the theatre child from the showtime
             }
-            apiMovie.setApiShowtimes(null);
+            apiMovie.setApiShowtimes(null); //remove the showtimes child from the movie
         }
-        return allTheatres.asList();
     }
 
     private void sortShowtimes() {
@@ -138,7 +138,7 @@ public class Main {
     }
 
     private void generateSchedule(ApiTheatre theatre, List<ApiMovie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<ApiShowtime> currentPermutation) {
-        if (movies.size() == 0) {
+        if (movies.size() == 0) { //end condition for recursive algorithm
             possibleSchedules.add(new Schedule(currentPermutation, theatre));
             return;
         }
