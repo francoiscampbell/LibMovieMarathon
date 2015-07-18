@@ -131,7 +131,7 @@ public class Main {
         String selections = s.nextLine();
         String[] selectionsArray = selections.split(",");
         for (String sel : selectionsArray) {
-            int selection = Integer.parseInt(sel);
+            int selection = Integer.parseInt(sel) - 1; //off by one error
             desiredMovies.add(movies.get(selection));
         }
         return desiredMovies;
