@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Set;
 
 @Generated("org.jsonschema2pojo")
-public class ApiTheatre {
+public class Theatre {
 
     @Expose
     private String id;
     @Expose
     private String name;
 
-    private List<ApiShowtime> showtimes = new ArrayList<>();
+    private List<Showtime> showtimes = new ArrayList<>();
 
     /**
      * @return The id
@@ -33,7 +33,7 @@ public class ApiTheatre {
         this.id = id;
     }
 
-    public ApiTheatre withId(String id) {
+    public Theatre withId(String id) {
         this.id = id;
         return this;
     }
@@ -52,22 +52,22 @@ public class ApiTheatre {
         this.name = name;
     }
 
-    public ApiTheatre withName(String name) {
+    public Theatre withName(String name) {
         this.name = name;
         return this;
     }
 
-    public List<ApiShowtime> getShowtimes() {
+    public List<Showtime> getShowtimes() {
         return showtimes;
     }
 
-    public void addShowtime(ApiShowtime showtime) {
+    public void addShowtime(Showtime showtime) {
         showtimes.add(showtime);
     }
 
-    public Set<ApiMovie> getMoviesPlayingHere() {
-        Set<ApiMovie> movies = new HashSet<>();
-        for (ApiShowtime s : showtimes) {
+    public Set<Movie> getMoviesPlayingHere() {
+        Set<Movie> movies = new HashSet<>();
+        for (Showtime s : showtimes) {
             movies.add(s.getMovie());
         }
         return movies;
@@ -78,9 +78,9 @@ public class ApiTheatre {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ApiTheatre apiTheatre = (ApiTheatre) o;
+        Theatre theatre = (Theatre) o;
 
-        if (!id.equals(apiTheatre.id)) return false;
+        if (!id.equals(theatre.id)) return false;
 
         return true;
     }

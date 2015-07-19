@@ -2,7 +2,6 @@
 package io.github.francoiscampbell.apimodel;
 
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Generated("org.jsonschema2pojo")
-public class ApiMovie {
+public class Movie {
 
     @Expose
     private String tmsId;
@@ -45,21 +44,17 @@ public class ApiMovie {
     @Expose
     private String officialUrl;
     @Expose
-    @SerializedName("qualityRating")
-    private ApiQualityRating apiQualityRating;
+    private QualityRating qualityRating;
     @Expose
-    @SerializedName("ratings")
-    private List<ApiRating> apiRatings = new ArrayList<>();
+    private List<Rating> ratings = new ArrayList<>();
     @Expose
     private List<String> advisories = new ArrayList<>();
     @Expose
     private Duration runTime;
     @Expose
-    @SerializedName("preferredImage")
-    private ApiPreferredImage apiPreferredImage;
+    private PreferredImage preferredImage;
     @Expose
-    @SerializedName("showtimes")
-    private List<ApiShowtime> apiShowtimes = new ArrayList<>();
+    private List<Showtime> showtimes = new ArrayList<>();
 
     private Duration previewsLength = Duration.standardMinutes(15); //hardcoded previews length to 15
 
@@ -77,7 +72,7 @@ public class ApiMovie {
         this.tmsId = tmsId;
     }
 
-    public ApiMovie withTmsId(String tmsId) {
+    public Movie withTmsId(String tmsId) {
         this.tmsId = tmsId;
         return this;
     }
@@ -96,7 +91,7 @@ public class ApiMovie {
         this.rootId = rootId;
     }
 
-    public ApiMovie withRootId(String rootId) {
+    public Movie withRootId(String rootId) {
         this.rootId = rootId;
         return this;
     }
@@ -115,7 +110,7 @@ public class ApiMovie {
         this.subType = subType;
     }
 
-    public ApiMovie withSubType(String subType) {
+    public Movie withSubType(String subType) {
         this.subType = subType;
         return this;
     }
@@ -134,7 +129,7 @@ public class ApiMovie {
         this.title = title;
     }
 
-    public ApiMovie withTitle(String title) {
+    public Movie withTitle(String title) {
         this.title = title;
         return this;
     }
@@ -153,7 +148,7 @@ public class ApiMovie {
         this.releaseYear = releaseYear;
     }
 
-    public ApiMovie withReleaseYear(int releaseYear) {
+    public Movie withReleaseYear(int releaseYear) {
         this.releaseYear = releaseYear;
         return this;
     }
@@ -172,7 +167,7 @@ public class ApiMovie {
         this.releaseDate = releaseDate;
     }
 
-    public ApiMovie withReleaseDate(DateTime releaseDate) {
+    public Movie withReleaseDate(DateTime releaseDate) {
         this.releaseDate = releaseDate;
         return this;
     }
@@ -191,7 +186,7 @@ public class ApiMovie {
         this.titleLang = titleLang;
     }
 
-    public ApiMovie withTitleLang(String titleLang) {
+    public Movie withTitleLang(String titleLang) {
         this.titleLang = titleLang;
         return this;
     }
@@ -210,7 +205,7 @@ public class ApiMovie {
         this.descriptionLang = descriptionLang;
     }
 
-    public ApiMovie withDescriptionLang(String descriptionLang) {
+    public Movie withDescriptionLang(String descriptionLang) {
         this.descriptionLang = descriptionLang;
         return this;
     }
@@ -229,7 +224,7 @@ public class ApiMovie {
         this.entityType = entityType;
     }
 
-    public ApiMovie withEntityType(String entityType) {
+    public Movie withEntityType(String entityType) {
         this.entityType = entityType;
         return this;
     }
@@ -248,7 +243,7 @@ public class ApiMovie {
         this.genres = genres;
     }
 
-    public ApiMovie withGenres(List<String> genres) {
+    public Movie withGenres(List<String> genres) {
         this.genres = genres;
         return this;
     }
@@ -267,7 +262,7 @@ public class ApiMovie {
         this.longDescription = longDescription;
     }
 
-    public ApiMovie withLongDescription(String longDescription) {
+    public Movie withLongDescription(String longDescription) {
         this.longDescription = longDescription;
         return this;
     }
@@ -286,7 +281,7 @@ public class ApiMovie {
         this.shortDescription = shortDescription;
     }
 
-    public ApiMovie withShortDescription(String shortDescription) {
+    public Movie withShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
         return this;
     }
@@ -305,7 +300,7 @@ public class ApiMovie {
         this.topCast = topCast;
     }
 
-    public ApiMovie withTopCast(List<String> topCast) {
+    public Movie withTopCast(List<String> topCast) {
         this.topCast = topCast;
         return this;
     }
@@ -324,7 +319,7 @@ public class ApiMovie {
         this.directors = directors;
     }
 
-    public ApiMovie withDirectors(List<String> directors) {
+    public Movie withDirectors(List<String> directors) {
         this.directors = directors;
         return this;
     }
@@ -343,46 +338,46 @@ public class ApiMovie {
         this.officialUrl = officialUrl;
     }
 
-    public ApiMovie withOfficialUrl(String officialUrl) {
+    public Movie withOfficialUrl(String officialUrl) {
         this.officialUrl = officialUrl;
         return this;
     }
 
     /**
-     * @return The apiQualityRating
+     * @return The qualityRating
      */
-    public ApiQualityRating getApiQualityRating() {
-        return apiQualityRating;
+    public QualityRating getQualityRating() {
+        return qualityRating;
     }
 
     /**
-     * @param apiQualityRating The apiQualityRating
+     * @param qualityRating The qualityRating
      */
-    public void setApiQualityRating(ApiQualityRating apiQualityRating) {
-        this.apiQualityRating = apiQualityRating;
+    public void setQualityRating(QualityRating qualityRating) {
+        this.qualityRating = qualityRating;
     }
 
-    public ApiMovie withQualityRating(ApiQualityRating apiQualityRating) {
-        this.apiQualityRating = apiQualityRating;
+    public Movie withQualityRating(QualityRating qualityRating) {
+        this.qualityRating = qualityRating;
         return this;
     }
 
     /**
-     * @return The apiRatings
+     * @return The ratings
      */
-    public List<ApiRating> getApiRatings() {
-        return apiRatings;
+    public List<Rating> getRatings() {
+        return ratings;
     }
 
     /**
-     * @param apiRatings The apiRatings
+     * @param ratings The ratings
      */
-    public void setApiRatings(List<ApiRating> apiRatings) {
-        this.apiRatings = apiRatings;
+    public void setRatings(List<Rating> ratings) {
+        this.ratings = ratings;
     }
 
-    public ApiMovie withRatings(List<ApiRating> apiRatings) {
-        this.apiRatings = apiRatings;
+    public Movie withRatings(List<Rating> ratings) {
+        this.ratings = ratings;
         return this;
     }
 
@@ -400,7 +395,7 @@ public class ApiMovie {
         this.advisories = advisories;
     }
 
-    public ApiMovie withAdvisories(List<String> advisories) {
+    public Movie withAdvisories(List<String> advisories) {
         this.advisories = advisories;
         return this;
     }
@@ -419,46 +414,46 @@ public class ApiMovie {
         this.runTime = runTime;
     }
 
-    public ApiMovie withRunTime(Duration runTime) {
+    public Movie withRunTime(Duration runTime) {
         this.runTime = runTime;
         return this;
     }
 
     /**
-     * @return The apiPreferredImage
+     * @return The preferredImage
      */
-    public ApiPreferredImage getApiPreferredImage() {
-        return apiPreferredImage;
+    public PreferredImage getPreferredImage() {
+        return preferredImage;
     }
 
     /**
-     * @param apiPreferredImage The apiPreferredImage
+     * @param preferredImage The preferredImage
      */
-    public void setApiPreferredImage(ApiPreferredImage apiPreferredImage) {
-        this.apiPreferredImage = apiPreferredImage;
+    public void setPreferredImage(PreferredImage preferredImage) {
+        this.preferredImage = preferredImage;
     }
 
-    public ApiMovie withPreferredImage(ApiPreferredImage apiPreferredImage) {
-        this.apiPreferredImage = apiPreferredImage;
+    public Movie withPreferredImage(PreferredImage preferredImage) {
+        this.preferredImage = preferredImage;
         return this;
     }
 
     /**
-     * @return The apiShowtimes
+     * @return The showtimes
      */
-    public List<ApiShowtime> getApiShowtimes() {
-        return apiShowtimes;
+    public List<Showtime> getShowtimes() {
+        return showtimes;
     }
 
     /**
-     * @param apiShowtimes The apiShowtimes
+     * @param showtimes The showtimes
      */
-    public void setApiShowtimes(List<ApiShowtime> apiShowtimes) {
-        this.apiShowtimes = apiShowtimes;
+    public void setShowtimes(List<Showtime> showtimes) {
+        this.showtimes = showtimes;
     }
 
-    public ApiMovie withShowtimes(List<ApiShowtime> apiShowtimes) {
-        this.apiShowtimes = apiShowtimes;
+    public Movie withShowtimes(List<Showtime> showtimes) {
+        this.showtimes = showtimes;
         return this;
     }
 
@@ -480,9 +475,9 @@ public class ApiMovie {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ApiMovie apiMovie = (ApiMovie) o;
+        Movie movie = (Movie) o;
 
-        return Objects.equals(tmsId, apiMovie.tmsId);
+        return Objects.equals(tmsId, movie.tmsId);
     }
 
     @Override

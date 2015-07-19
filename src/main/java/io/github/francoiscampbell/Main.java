@@ -2,9 +2,9 @@ package io.github.francoiscampbell;
 
 import io.github.francoiscampbell.api.ApiKey;
 import io.github.francoiscampbell.api.OnConnectApiRequest;
-import io.github.francoiscampbell.apimodel.ApiMovie;
-import io.github.francoiscampbell.apimodel.ApiShowtime;
-import io.github.francoiscampbell.apimodel.ApiTheatre;
+import io.github.francoiscampbell.apimodel.Movie;
+import io.github.francoiscampbell.apimodel.Showtime;
+import io.github.francoiscampbell.apimodel.Theatre;
 import io.github.francoiscampbell.collections.SelfMap;
 import io.github.francoiscampbell.model.Schedule;
 import org.joda.time.DateTime;
@@ -34,21 +34,21 @@ public class Main {
     }
 
     public void start() {
-        List<ApiMovie> allMovies = getMovies();
+        List<Movie> allMovies = getMovies();
 
         mainLoop(allMovies);
     }
 
-    private void mainLoop(List<ApiMovie> allMovies) {
-        List<ApiTheatre> allTheatres = reorganizeMoviesIntoModel(allMovies);
+    private void mainLoop(List<Movie> allMovies) {
+        List<Theatre> allTheatres = reorganizeMoviesIntoModel(allMovies);
 
         do {
-            List<ApiMovie> desiredMovies = selectMovies(allMovies);
-            List<ApiTheatre> possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
+            List<Movie> desiredMovies = selectMovies(allMovies);
+            List<Theatre> possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
 
             List<Schedule> possibleSchedules = new ArrayList<>();
-            Deque<ApiShowtime> currentPermutation = new LinkedList<>();
-            for (ApiTheatre t : possibleTheatres) {
+            Deque<Showtime> currentPermutation = new LinkedList<>();
+            for (Theatre t : possibleTheatres) {
                 generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
             }
             sortSchedulesByDelay(possibleSchedules);
@@ -68,21 +68,21 @@ public class Main {
      *
      * @param allMovies The list of movies to choose from
      */
-    private List<ApiTheatre> reorganizeMoviesIntoModel(List<ApiMovie> allMovies) {
-        SelfMap<ApiTheatre> allTheatres = new SelfMap<>();
+    private List<Theatre> reorganizeMoviesIntoModel(List<Movie> allMovies) {
+        SelfMap<Theatre> allTheatres = new SelfMap<>();
 
-        for (ApiMovie apiMovie : allMovies) {
-            for (ApiShowtime apiShowtime : apiMovie.getApiShowtimes()) {
-                apiShowtime.setMovie(apiMovie); //set the movie to be a child of the showtime
-                ApiTheatre apiTheatre = allTheatres.putIfAbsent(apiShowtime
-                        .getApiTheatre()); //reduce identical object duplication by getting a copy
-                apiTheatre.addShowtime(apiShowtime); //add the showtime to the showtimes for this theatre
+        for (Movie movie : allMovies) {
+            for (Showtime showtime : movie.getShowtimes()) {
+                showtime.setMovie(movie); //set the movie to be a child of the showtime
+                Theatre theatre = allTheatres.putIfAbsent(showtime
+                        .getTheatre()); //reduce identical object duplication by getting a copy
+                theatre.addShowtime(showtime); //add the showtime to the showtimes for this theatre
 
-                apiShowtime.setApiTheatre(null); //remove the theatre child from the showtime
+                showtime.setTheatre(null); //remove the theatre child from the showtime
             }
-            apiMovie.setApiShowtimes(null); //remove the showtimes child from the movie
+            movie.setShowtimes(null); //remove the showtimes child from the movie
         }
-        for (ApiTheatre t : allTheatres) {
+        for (Theatre t : allTheatres) {
             Collections.sort(t.getShowtimes());
         }
         return allTheatres.asList();
@@ -92,9 +92,9 @@ public class Main {
         Collections.sort(possibleSchedules, (o1, o2) -> o1.getTotalDelay().compareTo(o2.getTotalDelay()));
     }
 
-    private List<ApiTheatre> calculatePossibleTheatres(List<ApiTheatre> allTheatres, List<ApiMovie> desiredMovies) {
-        List<ApiTheatre> possibleTheatres = new LinkedList<>();
-        for (ApiTheatre t : allTheatres) {
+    private List<Theatre> calculatePossibleTheatres(List<Theatre> allTheatres, List<Movie> desiredMovies) {
+        List<Theatre> possibleTheatres = new LinkedList<>();
+        for (Theatre t : allTheatres) {
             if (t.getMoviesPlayingHere().containsAll(desiredMovies)) {
                 possibleTheatres.add(t);
             }
@@ -102,7 +102,7 @@ public class Main {
         return possibleTheatres;
     }
 
-    private List<ApiMovie> getMovies() {
+    private List<Movie> getMovies() {
         String currentDate = LocalDate.now().toString();
         OnConnectApiRequest request = new OnConnectApiRequest.Builder(currentDate)
                 .apiKey(ApiKey.API_KEY)
@@ -110,29 +110,29 @@ public class Main {
 //                .radiusUnit(OnConnectApiRequest.RadiusUnit.KM)
                 .build();
 
-        List<ApiMovie> allMovies = request.execute();
+        List<Movie> allMovies = request.execute();
         removeUnplannableMovies(allMovies);
         return allMovies;
     }
 
-    private void removeUnplannableMovies(List<ApiMovie> allMovies) {
-        for (Iterator<ApiMovie> iterator = allMovies.iterator(); iterator.hasNext(); ) {
+    private void removeUnplannableMovies(List<Movie> allMovies) {
+        for (Iterator<Movie> iterator = allMovies.iterator(); iterator.hasNext(); ) {
             if (iterator.next().getRunTime() == null) {
                 iterator.remove();
             }
         }
     }
 
-    private List<ApiMovie> selectMovies(List<ApiMovie> movies) {
+    private List<Movie> selectMovies(List<Movie> movies) {
         System.out.println("Select movie: ");
         int i = 0;
-        for (ApiMovie m : movies) {
+        for (Movie m : movies) {
             i++;
             System.out.println("\t" + i + ") " + m.getTitle());
 
         }
 
-        List<ApiMovie> desiredMovies = new ArrayList<>();
+        List<Movie> desiredMovies = new ArrayList<>();
         Scanner s = new Scanner(System.in);
         String selections = s.nextLine();
         String[] selectionsArray = selections.split(",");
@@ -143,17 +143,17 @@ public class Main {
         return desiredMovies;
     }
 
-    private void generateSchedule(ApiTheatre theatre, List<ApiMovie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<ApiShowtime> currentPermutation) {
+    private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
         if (movies.size() == 0) { //end condition for recursive algorithm
             possibleSchedules.add(new Schedule(currentPermutation, theatre));
             return;
         }
-        for (ApiMovie movie : movies) {
-            ApiShowtime showtime;
+        for (Movie movie : movies) {
+            Showtime showtime;
             DateTime nextAvailableStartTime = startTime;
             while ((showtime = findNextShowtimeForMovie(theatre, movie, nextAvailableStartTime)) != null) {
                 currentPermutation.add(showtime);
-                List<ApiMovie> remainingMovies = new ArrayList<>(movies);
+                List<Movie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
                 nextAvailableStartTime = showtime.getStartDateTime()
                                                  .plus(movie.getTotalLength());
@@ -163,8 +163,8 @@ public class Main {
         }
     }
 
-    private ApiShowtime findNextShowtimeForMovie(ApiTheatre theatre, ApiMovie movie, DateTime startTime) {
-        for (ApiShowtime showtime : theatre.getShowtimes()) {
+    private Showtime findNextShowtimeForMovie(Theatre theatre, Movie movie, DateTime startTime) {
+        for (Showtime showtime : theatre.getShowtimes()) {
             DateTime dateTime = showtime.getStartDateTime();
             if (showtime.getMovie()
                         .equals(movie) && dateTime.isAfter(startTime)) {
@@ -183,7 +183,7 @@ public class Main {
             System.out.println("Schedule " + i + " at " + schedule.getTheatre()
                                                                   .getName() + ":");
 
-            Map<ApiShowtime, Duration> delays = schedule.getDelays();
+            Map<Showtime, Duration> delays = schedule.getDelays();
             Duration minDelay;
             Duration maxDelay;
             Duration difference;
@@ -196,7 +196,7 @@ public class Main {
             }
             difference = maxDelay.minus(minDelay);
 
-            for (ApiShowtime showtime : schedule.getShowtimes()) {
+            for (Showtime showtime : schedule.getShowtimes()) {
                 System.out.println("\t" + showtime.toFriendlyString());
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
                 if (delay != null) {

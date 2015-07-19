@@ -1,11 +1,12 @@
 
 package io.github.francoiscampbell.apimodel;
 
-import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 
+import javax.annotation.Generated;
+
 @Generated("org.jsonschema2pojo")
-public class ApiRating {
+public class Rating {
 
     @Expose
     private String body;
@@ -30,7 +31,7 @@ public class ApiRating {
         this.body = body;
     }
 
-    public ApiRating withBody(String body) {
+    public Rating withBody(String body) {
         this.body = body;
         return this;
     }
@@ -53,7 +54,7 @@ public class ApiRating {
         this.code = code;
     }
 
-    public ApiRating withCode(String code) {
+    public Rating withCode(String code) {
         this.code = code;
         return this;
     }

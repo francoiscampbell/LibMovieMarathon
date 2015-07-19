@@ -2,7 +2,7 @@ package io.github.francoiscampbell.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.github.francoiscampbell.apimodel.ApiMovie;
+import io.github.francoiscampbell.apimodel.Movie;
 import io.github.francoiscampbell.gson.DateTimeConverter;
 import io.github.francoiscampbell.gson.DurationConverter;
 import org.joda.time.DateTime;
@@ -29,8 +29,26 @@ public class OnConnectApiRequest {
         this.queryParams = builder.queryParams;
     }
 
-    public List<ApiMovie> execute() {
+    public List<Movie> execute() {
         return api.getMovies(queryParams);
+    }
+
+    /**
+     * Created by francois on 15-07-10.
+     */
+    public enum RadiusUnit {
+        KM("km"),
+        MILES("mi");
+
+        private String unitString;
+
+        RadiusUnit(String unitString) {
+            this.unitString = unitString;
+        }
+
+        public String getUnitString() {
+            return unitString;
+        }
     }
 
     public static class Builder {
@@ -100,23 +118,5 @@ public class OnConnectApiRequest {
             return new OnConnectApiRequest(this);
         }
 
-    }
-
-    /**
-     * Created by francois on 15-07-10.
-     */
-    public enum RadiusUnit {
-        KM("km"),
-        MILES("mi");
-
-        private String unitString;
-
-        RadiusUnit(String unitString) {
-            this.unitString = unitString;
-        }
-
-        public String getUnitString() {
-            return unitString;
-        }
     }
 }

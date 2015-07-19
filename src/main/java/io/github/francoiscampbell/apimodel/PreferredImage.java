@@ -2,20 +2,18 @@
 package io.github.francoiscampbell.apimodel;
 
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class ApiPreferredImage {
+public class PreferredImage {
 
     @Expose
     private String width;
     @Expose
     private String height;
     @Expose
-    @SerializedName("caption")
-    private ApiCaption apiCaption;
+    private Caption caption;
     @Expose
     private String uri;
     @Expose
@@ -43,7 +41,7 @@ public class ApiPreferredImage {
         this.width = width;
     }
 
-    public ApiPreferredImage withWidth(String width) {
+    public PreferredImage withWidth(String width) {
         this.width = width;
         return this;
     }
@@ -66,7 +64,7 @@ public class ApiPreferredImage {
         this.height = height;
     }
 
-    public ApiPreferredImage withHeight(String height) {
+    public PreferredImage withHeight(String height) {
         this.height = height;
         return this;
     }
@@ -74,23 +72,23 @@ public class ApiPreferredImage {
     /**
      * 
      * @return
-     *     The apiCaption
+     *     The caption
      */
-    public ApiCaption getApiCaption() {
-        return apiCaption;
+    public Caption getCaption() {
+        return caption;
     }
 
     /**
-     * 
-     * @param apiCaption
-     *     The apiCaption
+     *
+     * @param caption
+     *     The caption
      */
-    public void setApiCaption(ApiCaption apiCaption) {
-        this.apiCaption = apiCaption;
+    public void setCaption(Caption caption) {
+        this.caption = caption;
     }
 
-    public ApiPreferredImage withCaption(ApiCaption apiCaption) {
-        this.apiCaption = apiCaption;
+    public PreferredImage withCaption(Caption caption) {
+        this.caption = caption;
         return this;
     }
 
@@ -112,7 +110,7 @@ public class ApiPreferredImage {
         this.uri = uri;
     }
 
-    public ApiPreferredImage withUri(String uri) {
+    public PreferredImage withUri(String uri) {
         this.uri = uri;
         return this;
     }
@@ -135,7 +133,7 @@ public class ApiPreferredImage {
         this.category = category;
     }
 
-    public ApiPreferredImage withCategory(String category) {
+    public PreferredImage withCategory(String category) {
         this.category = category;
         return this;
     }
@@ -158,7 +156,7 @@ public class ApiPreferredImage {
         this.text = text;
     }
 
-    public ApiPreferredImage withText(String text) {
+    public PreferredImage withText(String text) {
         this.text = text;
         return this;
     }
@@ -181,7 +179,7 @@ public class ApiPreferredImage {
         this.primary = primary;
     }
 
-    public ApiPreferredImage withPrimary(String primary) {
+    public PreferredImage withPrimary(String primary) {
         this.primary = primary;
         return this;
     }

@@ -1,6 +1,6 @@
 package io.github.francoiscampbell.api;
 
-import io.github.francoiscampbell.apimodel.ApiMovie;
+import io.github.francoiscampbell.apimodel.Movie;
 import retrofit.http.GET;
 import retrofit.http.QueryMap;
 
@@ -13,5 +13,5 @@ import java.util.Map;
 public interface MovieApi {
 
     @GET("/v1.1/movies/showings")
-    List<ApiMovie> getMovies(@QueryMap Map<String, String> queryParams);
+    List<Movie> getMovies(@QueryMap Map<String, String> queryParams);
 }

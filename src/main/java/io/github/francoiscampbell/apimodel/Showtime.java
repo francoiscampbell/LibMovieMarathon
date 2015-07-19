@@ -2,18 +2,16 @@
 package io.github.francoiscampbell.apimodel;
 
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class ApiShowtime implements Comparable<ApiShowtime> {
+public class Showtime implements Comparable<Showtime> {
 
     @Expose
-    @SerializedName("theatre")
-    private ApiTheatre apiTheatre;
+    private Theatre theatre;
     @Expose
     private DateTime dateTime;
     @Expose
@@ -21,28 +19,28 @@ public class ApiShowtime implements Comparable<ApiShowtime> {
     @Expose
     private boolean barg;
 
-    private ApiMovie movie;
+    private Movie movie;
 
     /**
      * 
      * @return
-     *     The apiTheatre
+     *     The theatre
      */
-    public ApiTheatre getApiTheatre() {
-        return apiTheatre;
+    public Theatre getTheatre() {
+        return theatre;
     }
 
     /**
-     * 
-     * @param apiTheatre
-     *     The apiTheatre
+     *
+     * @param theatre
+     *     The theatre
      */
-    public void setApiTheatre(ApiTheatre apiTheatre) {
-        this.apiTheatre = apiTheatre;
+    public void setTheatre(Theatre theatre) {
+        this.theatre = theatre;
     }
 
-    public ApiShowtime withTheatre(ApiTheatre apiTheatre) {
-        this.apiTheatre = apiTheatre;
+    public Showtime withTheatre(Theatre theatre) {
+        this.theatre = theatre;
         return this;
     }
 
@@ -64,7 +62,7 @@ public class ApiShowtime implements Comparable<ApiShowtime> {
         this.dateTime = dateTime;
     }
 
-    public ApiShowtime withDateTime(DateTime dateTime) {
+    public Showtime withDateTime(DateTime dateTime) {
         this.dateTime = dateTime;
         return this;
     }
@@ -87,7 +85,7 @@ public class ApiShowtime implements Comparable<ApiShowtime> {
         this.quals = quals;
     }
 
-    public ApiShowtime withQuals(String quals) {
+    public Showtime withQuals(String quals) {
         this.quals = quals;
         return this;
     }
@@ -110,16 +108,16 @@ public class ApiShowtime implements Comparable<ApiShowtime> {
         this.barg = barg;
     }
 
-    public ApiShowtime withBarg(boolean barg) {
+    public Showtime withBarg(boolean barg) {
         this.barg = barg;
         return this;
     }
 
-    public ApiMovie getMovie() {
+    public Movie getMovie() {
         return movie;
     }
 
-    public void setMovie(ApiMovie movie) {
+    public void setMovie(Movie movie) {
         this.movie = movie;
     }
 
@@ -141,7 +139,7 @@ public class ApiShowtime implements Comparable<ApiShowtime> {
     }
 
     @Override
-    public int compareTo(@NotNull ApiShowtime o) {
+    public int compareTo(@NotNull Showtime o) {
         return dateTime.compareTo(o.getStartDateTime());
     }
 
@@ -159,10 +157,10 @@ public class ApiShowtime implements Comparable<ApiShowtime> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ApiShowtime apiShowtime = (ApiShowtime) o;
+        Showtime showtime = (Showtime) o;
 
-        if (!apiTheatre.equals(apiShowtime.apiTheatre)) return false;
-        if (!dateTime.equals(apiShowtime.dateTime)) return false;
+        if (!theatre.equals(showtime.theatre)) return false;
+        if (!dateTime.equals(showtime.dateTime)) return false;
 
         return true;
     }

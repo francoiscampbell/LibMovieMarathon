@@ -1,7 +1,7 @@
 package io.github.francoiscampbell.model;
 
-import io.github.francoiscampbell.apimodel.ApiShowtime;
-import io.github.francoiscampbell.apimodel.ApiTheatre;
+import io.github.francoiscampbell.apimodel.Showtime;
+import io.github.francoiscampbell.apimodel.Theatre;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
@@ -11,24 +11,24 @@ import java.util.*;
  * Created by francois on 15-07-04.
  */
 public class Schedule {
-    private ApiTheatre theatre;
-    private Deque<ApiShowtime> showtimes;
-    private Map<ApiShowtime, Duration> delays;
+    private Theatre theatre;
+    private Deque<Showtime> showtimes;
+    private Map<Showtime, Duration> delays;
     private Duration totalDelay;
 
-    public Schedule(Deque<ApiShowtime> showtimes, ApiTheatre theatre) {
+    public Schedule(Deque<Showtime> showtimes, Theatre theatre) {
         this.showtimes = new LinkedList<>(showtimes);
         this.theatre = theatre;
         this.delays = calculateDelays(showtimes);
         this.totalDelay = calculateTotalDelay();
     }
 
-    private Map<ApiShowtime, Duration> calculateDelays(Deque<ApiShowtime> showtimes) {
-        Map<ApiShowtime, Duration> delays = new LinkedHashMap<>();
-        Iterator<ApiShowtime> iterator = showtimes.iterator();
-        ApiShowtime next = iterator.next();
+    private Map<Showtime, Duration> calculateDelays(Deque<Showtime> showtimes) {
+        Map<Showtime, Duration> delays = new LinkedHashMap<>();
+        Iterator<Showtime> iterator = showtimes.iterator();
+        Showtime next = iterator.next();
         while (iterator.hasNext()) {
-            ApiShowtime current = next;
+            Showtime current = next;
             next = iterator.next();
             DateTime endTime = current.getEndDateTime();
             DateTime nextStartTime = next.getStartDateTime();
@@ -45,7 +45,7 @@ public class Schedule {
         return totalDelay;
     }
 
-    public Map<ApiShowtime, Duration> getDelays() {
+    public Map<Showtime, Duration> getDelays() {
         return delays;
     }
 
@@ -53,15 +53,15 @@ public class Schedule {
         return totalDelay;
     }
 
-    public Duration getDelayAfterShowtime(ApiShowtime showtime) {
+    public Duration getDelayAfterShowtime(Showtime showtime) {
         return delays.get(showtime);
     }
 
-    public Deque<ApiShowtime> getShowtimes() {
+    public Deque<Showtime> getShowtimes() {
         return showtimes;
     }
 
-    public ApiTheatre getTheatre() {
+    public Theatre getTheatre() {
         return theatre;
     }
 }
