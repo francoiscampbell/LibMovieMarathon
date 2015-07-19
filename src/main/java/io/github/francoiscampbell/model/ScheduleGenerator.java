@@ -12,15 +12,11 @@ import java.util.*;
  * Created by francois on 15-07-19.
  */
 public class ScheduleGenerator {
-    private List<Movie> allMovies;
     private List<Theatre> allTheatres;
     private List<Theatre> possibleTheatres;
 
     private List<Movie> desiredMovies;
     private boolean sortByDelay;
-
-    private ScheduleGenerator() {
-    }
 
     public List<Schedule> generateSchedules() {
         possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
@@ -85,7 +81,6 @@ public class ScheduleGenerator {
 
         public Builder(List<Movie> allMovies) {
             scheduleGenerator = new ScheduleGenerator();
-            scheduleGenerator.allMovies = allMovies;
             scheduleGenerator.allTheatres = reorganizeMoviesIntoModel(allMovies);
         }
 
