@@ -61,6 +61,10 @@ public class ApiTheatre {
         return showtimes;
     }
 
+    public void addShowtime(ApiShowtime showtime) {
+        showtimes.add(showtime);
+    }
+
     public Set<ApiMovie> getMoviesPlayingHere() {
         Set<ApiMovie> movies = new HashSet<>();
         for (ApiShowtime s : showtimes) {

@@ -1,21 +1,15 @@
 package io.github.francoiscampbell;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.github.francoiscampbell.api.ApiKey;
-import io.github.francoiscampbell.api.Request;
+import io.github.francoiscampbell.api.OnConnectApiRequest;
 import io.github.francoiscampbell.apimodel.ApiMovie;
 import io.github.francoiscampbell.apimodel.ApiShowtime;
 import io.github.francoiscampbell.apimodel.ApiTheatre;
 import io.github.francoiscampbell.collections.SelfMap;
-import io.github.francoiscampbell.gson.DateTimeConverter;
-import io.github.francoiscampbell.gson.DurationConverter;
 import io.github.francoiscampbell.model.Schedule;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.LocalDate;
-import retrofit.RestAdapter;
-import retrofit.converter.GsonConverter;
 
 import java.awt.*;
 import java.util.*;
@@ -25,10 +19,7 @@ import java.util.List;
  * Created by francois on 15-07-02.
  */
 public class Main {
-    private static final String API_URL = "http://data.tmsapi.com";
 
-    private SelfMap<ApiTheatre> allTheatres;
-    private List<ApiMovie> allMovies;
 
     /**
      * Main
@@ -36,28 +27,42 @@ public class Main {
      * TODO: Refactor to make this a proper application
      */
     public Main() {
-        allTheatres = new SelfMap<>();
-        allMovies = new ArrayList<>();
     }
 
     public void start() {
-        getMovies();
-        mainLoop();
+        List<ApiMovie> allMovies = getMovies();
+        List<ApiTheatre> allTheatres = reorganizeMoviesIntoModel(allMovies);
+
+        mainLoop(allMovies, allTheatres);
     }
 
-    private void mainLoop() {
+    private void mainLoop(List<ApiMovie> allMovies, List<ApiTheatre> allTheatres) {
         do {
             List<ApiMovie> desiredMovies = selectMovies(allMovies);
+            List<ApiTheatre> possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
+
             List<Schedule> possibleSchedules = new ArrayList<>();
             Deque<ApiShowtime> currentPermutation = new LinkedList<>();
-            for (ApiTheatre t : allTheatres) {
-                if (t.getMoviesPlayingHere().containsAll(desiredMovies)) {
-                    generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
-                }
+            for (ApiTheatre t : possibleTheatres) {
+                generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
             }
-            Collections.sort(possibleSchedules, (o1, o2) -> o1.getTotalDelay().compareTo(o2.getTotalDelay()));
+//            sortSchedulesByDelay(possibleSchedules);
             printSchedules(possibleSchedules);
         } while (!quit());
+    }
+
+    private void sortSchedulesByDelay(List<Schedule> possibleSchedules) {
+        Collections.sort(possibleSchedules, (o1, o2) -> o1.getTotalDelay().compareTo(o2.getTotalDelay()));
+    }
+
+    private List<ApiTheatre> calculatePossibleTheatres(List<ApiTheatre> allTheatres, List<ApiMovie> desiredMovies) {
+        List<ApiTheatre> possibleTheatres = new LinkedList<>();
+        for (ApiTheatre t : allTheatres) {
+            if (t.getMoviesPlayingHere().containsAll(desiredMovies)) {
+                possibleTheatres.add(t);
+            }
+        }
+        return possibleTheatres;
     }
 
 
@@ -67,55 +72,51 @@ public class Main {
                                      .startsWith("q");
     }
 
-    private void getMovies() {
-        Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new DateTimeConverter())
-                                     .registerTypeAdapter(Duration.class, new DurationConverter())
-                                     .create();
-
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setLogLevel(RestAdapter.LogLevel.FULL)
-                .setEndpoint(API_URL)
-                .setConverter(new GsonConverter(gson))
-                .build();
-
+    private List<ApiMovie> getMovies() {
         String currentDate = LocalDate.now().toString();
-        Request request = new Request.Builder(currentDate).endpoint(restAdapter)
-                                                          .apiKey(ApiKey.API_KEY)
+        OnConnectApiRequest request = new OnConnectApiRequest.Builder(currentDate)
+                .apiKey(ApiKey.API_KEY)
                 .postcode("M5T1N5")
-//                .radiusUnit(Request.RadiusUnit.KM)
+//                .radiusUnit(OnConnectApiRequest.RadiusUnit.KM)
                 .build();
 
-        allMovies = request.execute();
-        reorganizeMoviesIntoModel();
-        sortShowtimes();
+        List<ApiMovie> allMovies = request.execute();
+        removeUnplannableMovies(allMovies);
+        return allMovies;
+    }
+
+    private void removeUnplannableMovies(List<ApiMovie> allMovies) {
+        for (Iterator<ApiMovie> iterator = allMovies.iterator(); iterator.hasNext(); ) {
+            if (iterator.next().getRunTime() == null) {
+                iterator.remove();
+            }
+        }
     }
 
     /**
      * Reorganizes the response from the Gracenote API from a movies->theatres->showtimes
      * to theatres->showtimes->movies format
+     *
+     * @param allMovies
      */
-    private void reorganizeMoviesIntoModel() {
-        for (Iterator<ApiMovie> iterator = allMovies.iterator(); iterator.hasNext(); ) {
-            ApiMovie apiMovie = iterator.next();
-            if (apiMovie.getRunTime() == null) {
-                iterator.remove(); //null runtime events can't be planned (usually theatre events, etc)
-            }
+    private List<ApiTheatre> reorganizeMoviesIntoModel(List<ApiMovie> allMovies) {
+        SelfMap<ApiTheatre> allTheatres = new SelfMap<>();
+
+        for (ApiMovie apiMovie : allMovies) {
             for (ApiShowtime apiShowtime : apiMovie.getApiShowtimes()) {
                 apiShowtime.setMovie(apiMovie); //set the movie to be a child of the showtime
                 ApiTheatre apiTheatre = allTheatres.putIfAbsent(apiShowtime
-                        .getApiTheatre()); //reduce identical object duplication by getting the copy if it exists in the SelfMap of theratres
-                apiTheatre.getShowtimes().add(apiShowtime); //add the showtime to the showtimes for this theatre
+                        .getApiTheatre()); //reduce identical object duplication by getting a copy
+                apiTheatre.addShowtime(apiShowtime); //add the showtime to the showtimes for this theatre
 
                 apiShowtime.setApiTheatre(null); //remove the theatre child from the showtime
             }
             apiMovie.setApiShowtimes(null); //remove the showtimes child from the movie
         }
-    }
-
-    private void sortShowtimes() {
         for (ApiTheatre t : allTheatres) {
             Collections.sort(t.getShowtimes());
         }
+        return allTheatres.asList();
     }
 
     private List<ApiMovie> selectMovies(List<ApiMovie> movies) {
@@ -126,6 +127,7 @@ public class Main {
             System.out.println("\t" + i + ") " + m.getTitle());
 
         }
+
         List<ApiMovie> desiredMovies = new ArrayList<>();
         Scanner s = new Scanner(System.in);
         String selections = s.nextLine();
@@ -190,26 +192,34 @@ public class Main {
             }
             difference = maxDelay.minus(minDelay);
 
-
-            float[] redHsb = Color.RGBtoHSB(255, 0, 0, null);
-            float[] greenHsb = Color.RGBtoHSB(0, 255, 0, null);
-
             for (ApiShowtime showtime : schedule.getShowtimes()) {
                 System.out.println("\t" + showtime.toFriendlyString());
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
                 if (delay != null) {
                     float ratio = MoreMath.protectedDivide(delay.minus(minDelay)
                                                                 .getMillis(), difference.getMillis(), 1);
-                    float inverseRatio = 1 - ratio;
-                    float h = greenHsb[0] * ratio + redHsb[0] * inverseRatio;
-                    float s = greenHsb[1] * ratio + redHsb[1] * inverseRatio;
-                    float v = greenHsb[2] * ratio + redHsb[2] * inverseRatio;
-                    Color lerp = Color.getHSBColor(h, s, v);
+
+                    Color lerp = colorLerp(Color.GREEN, Color.RED, ratio);
 //                    System.out.println("lerp = " + lerp);
                     System.out.println("\tDelay of " + delay.getStandardMinutes() + " minutes");
                 }
             }
         }
+    }
+
+    private Color colorLerp(Color min, Color max, float ratio) {
+        float[] minHsb = Color.RGBtoHSB(min.getRed(), min.getGreen(), min.getBlue(), null);
+        float[] maxHsb = Color.RGBtoHSB(max.getRed(), max.getGreen(), max.getBlue(), null);
+        float[] hsb = hsbLerp(minHsb, maxHsb, ratio);
+        return Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
+    }
+
+    private float[] hsbLerp(float[] minHsb, float[] maxHsb, float ratio) {
+        float inverseRatio = 1 - ratio;
+        float h = minHsb[0] * ratio + maxHsb[0] * inverseRatio;
+        float s = minHsb[1] * ratio + maxHsb[1] * inverseRatio;
+        float b = minHsb[2] * ratio + maxHsb[2] * inverseRatio;
+        return new float[]{h, s, b};
     }
 
 

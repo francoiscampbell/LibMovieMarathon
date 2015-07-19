@@ -1,7 +1,14 @@
 package io.github.francoiscampbell.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.github.francoiscampbell.apimodel.ApiMovie;
+import io.github.francoiscampbell.gson.DateTimeConverter;
+import io.github.francoiscampbell.gson.DurationConverter;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,37 +17,42 @@ import java.util.Map;
 /**
  * Created by francois on 15-07-10.
  */
-public class Request {
-    private RestAdapter endpoint;
+public class OnConnectApiRequest {
+    private static final String API_URL = "http://data.tmsapi.com";
+
+    private MovieApi api;
     private Map<String, String> queryParams;
 
-    private Request(Builder builder) {
-        endpoint = builder.endpoint;
+    private OnConnectApiRequest(Builder builder) {
+        api = builder.endpointBuilder.build().create(MovieApi.class);
+
         this.queryParams = builder.queryParams;
     }
 
     public List<ApiMovie> execute() {
-        MovieApi api = endpoint.create(MovieApi.class);
         return api.getMovies(queryParams);
     }
 
     public static class Builder {
-        private RestAdapter endpoint;
+        private RestAdapter.Builder endpointBuilder;
         private Map<String, String> queryParams;
 
 
         public Builder(String startDate) {
             queryParams = new HashMap<>();
             queryParams.put("startDate", startDate);
+
+            Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new DateTimeConverter())
+                                         .registerTypeAdapter(Duration.class, new DurationConverter())
+                                         .create();
+
+            endpointBuilder = new RestAdapter.Builder()
+                    .setEndpoint(API_URL)
+                    .setConverter(new GsonConverter(gson));
         }
 
         public Builder(Builder builder) {
             this.queryParams = builder.queryParams;
-        }
-
-        public Builder endpoint(RestAdapter endpoint) {
-            this.endpoint = endpoint;
-            return this;
         }
 
         public Builder apiKey(String apiKey) {
@@ -79,8 +91,13 @@ public class Request {
             return this;
         }
 
-        public Request build() {
-            return new Request(this);
+        public Builder logLevel(RestAdapter.LogLevel logLevel) {
+            endpointBuilder.setLogLevel(logLevel);
+            return this;
+        }
+
+        public OnConnectApiRequest build() {
+            return new OnConnectApiRequest(this);
         }
 
     }
