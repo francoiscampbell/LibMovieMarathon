@@ -29,14 +29,19 @@ public class Main {
     public Main() {
     }
 
-    public void start() {
-        List<ApiMovie> allMovies = getMovies();
-        List<ApiTheatre> allTheatres = reorganizeMoviesIntoModel(allMovies);
-
-        mainLoop(allMovies, allTheatres);
+    public static void main(String[] args) {
+        new Main().start();
     }
 
-    private void mainLoop(List<ApiMovie> allMovies, List<ApiTheatre> allTheatres) {
+    public void start() {
+        List<ApiMovie> allMovies = getMovies();
+
+        mainLoop(allMovies);
+    }
+
+    private void mainLoop(List<ApiMovie> allMovies) {
+        List<ApiTheatre> allTheatres = reorganizeMoviesIntoModel(allMovies);
+
         do {
             List<ApiMovie> desiredMovies = selectMovies(allMovies);
             List<ApiTheatre> possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
@@ -46,9 +51,41 @@ public class Main {
             for (ApiTheatre t : possibleTheatres) {
                 generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
             }
-//            sortSchedulesByDelay(possibleSchedules);
+            sortSchedulesByDelay(possibleSchedules);
             printSchedules(possibleSchedules);
         } while (!quit());
+    }
+
+    private boolean quit() {
+        System.out.println("Type 'q' to quit");
+        return new Scanner(System.in).next()
+                                     .startsWith("q");
+    }
+
+    /**
+     * Reorganizes the response from the Gracenote API from a movies->theatres->showtimes
+     * to theatres->showtimes->movies format
+     *
+     * @param allMovies The list of movies to choose from
+     */
+    private List<ApiTheatre> reorganizeMoviesIntoModel(List<ApiMovie> allMovies) {
+        SelfMap<ApiTheatre> allTheatres = new SelfMap<>();
+
+        for (ApiMovie apiMovie : allMovies) {
+            for (ApiShowtime apiShowtime : apiMovie.getApiShowtimes()) {
+                apiShowtime.setMovie(apiMovie); //set the movie to be a child of the showtime
+                ApiTheatre apiTheatre = allTheatres.putIfAbsent(apiShowtime
+                        .getApiTheatre()); //reduce identical object duplication by getting a copy
+                apiTheatre.addShowtime(apiShowtime); //add the showtime to the showtimes for this theatre
+
+                apiShowtime.setApiTheatre(null); //remove the theatre child from the showtime
+            }
+            apiMovie.setApiShowtimes(null); //remove the showtimes child from the movie
+        }
+        for (ApiTheatre t : allTheatres) {
+            Collections.sort(t.getShowtimes());
+        }
+        return allTheatres.asList();
     }
 
     private void sortSchedulesByDelay(List<Schedule> possibleSchedules) {
@@ -63,13 +100,6 @@ public class Main {
             }
         }
         return possibleTheatres;
-    }
-
-
-    private boolean quit() {
-        System.out.println("Type 'q' to quit");
-        return new Scanner(System.in).next()
-                                     .startsWith("q");
     }
 
     private List<ApiMovie> getMovies() {
@@ -91,32 +121,6 @@ public class Main {
                 iterator.remove();
             }
         }
-    }
-
-    /**
-     * Reorganizes the response from the Gracenote API from a movies->theatres->showtimes
-     * to theatres->showtimes->movies format
-     *
-     * @param allMovies
-     */
-    private List<ApiTheatre> reorganizeMoviesIntoModel(List<ApiMovie> allMovies) {
-        SelfMap<ApiTheatre> allTheatres = new SelfMap<>();
-
-        for (ApiMovie apiMovie : allMovies) {
-            for (ApiShowtime apiShowtime : apiMovie.getApiShowtimes()) {
-                apiShowtime.setMovie(apiMovie); //set the movie to be a child of the showtime
-                ApiTheatre apiTheatre = allTheatres.putIfAbsent(apiShowtime
-                        .getApiTheatre()); //reduce identical object duplication by getting a copy
-                apiTheatre.addShowtime(apiShowtime); //add the showtime to the showtimes for this theatre
-
-                apiShowtime.setApiTheatre(null); //remove the theatre child from the showtime
-            }
-            apiMovie.setApiShowtimes(null); //remove the showtimes child from the movie
-        }
-        for (ApiTheatre t : allTheatres) {
-            Collections.sort(t.getShowtimes());
-        }
-        return allTheatres.asList();
     }
 
     private List<ApiMovie> selectMovies(List<ApiMovie> movies) {
@@ -220,10 +224,5 @@ public class Main {
         float s = minHsb[1] * ratio + maxHsb[1] * inverseRatio;
         float b = minHsb[2] * ratio + maxHsb[2] * inverseRatio;
         return new float[]{h, s, b};
-    }
-
-
-    public static void main(String[] args) {
-        new Main().start();
     }
 }
