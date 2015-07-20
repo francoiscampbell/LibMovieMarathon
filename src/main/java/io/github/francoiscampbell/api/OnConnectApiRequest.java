@@ -1,18 +1,13 @@
 package io.github.francoiscampbell.api;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.github.francoiscampbell.apimodel.Movie;
-import io.github.francoiscampbell.gson.DateTimeConverter;
-import io.github.francoiscampbell.gson.DurationConverter;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-import retrofit.RestAdapter;
-import retrofit.converter.GsonConverter;
+import com.google.gson.*;
+import io.github.francoiscampbell.apimodel.*;
+import io.github.francoiscampbell.gson.*;
+import org.joda.time.*;
+import retrofit.*;
+import retrofit.converter.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by francois on 15-07-10.
@@ -24,6 +19,10 @@ public class OnConnectApiRequest {
 
     public List<Movie> execute() {
         return api.getMovies(queryParams);
+    }
+
+    public void execute(Callback<List<Movie>> callback) {
+        api.getMovies(queryParams, callback);
     }
 
     public static class Builder {
