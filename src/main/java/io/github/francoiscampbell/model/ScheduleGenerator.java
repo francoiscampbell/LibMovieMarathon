@@ -2,10 +2,10 @@ package io.github.francoiscampbell.model;
 
 import io.github.francoiscampbell.apimodel.*;
 import io.github.francoiscampbell.collections.*;
+import java8.util.stream.*;
 import org.joda.time.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * Created by francois on 15-07-19.
@@ -40,8 +40,9 @@ public class ScheduleGenerator {
         Collections.sort(possibleSchedules, (o1, o2) -> o1.getTotalDelay().compareTo(o2.getTotalDelay()));
     }
 
+
     private List<Theatre> calculatePossibleTheatres(List<Theatre> allTheatres, List<Movie> desiredMovies) {
-        return StreamSupport.stream(allTheatres.spliterator(), false)
+        return StreamSupport.stream(allTheatres)
                             .filter(t -> t.getMoviesPlayingHere().containsAll(desiredMovies))
                             .collect(Collectors.toList());
     }
