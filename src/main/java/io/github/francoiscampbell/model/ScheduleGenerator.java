@@ -1,13 +1,11 @@
 package io.github.francoiscampbell.model;
 
-import io.github.francoiscampbell.apimodel.Movie;
-import io.github.francoiscampbell.apimodel.Showtime;
-import io.github.francoiscampbell.apimodel.Theatre;
-import io.github.francoiscampbell.collections.SelfMap;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
+import io.github.francoiscampbell.apimodel.*;
+import io.github.francoiscampbell.collections.*;
+import org.joda.time.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 /**
  * Created by francois on 15-07-19.
@@ -43,13 +41,9 @@ public class ScheduleGenerator {
     }
 
     private List<Theatre> calculatePossibleTheatres(List<Theatre> allTheatres, List<Movie> desiredMovies) {
-        List<Theatre> possibleTheatres = new LinkedList<>();
-        for (Theatre t : allTheatres) {
-            if (t.getMoviesPlayingHere().containsAll(desiredMovies)) {
-                possibleTheatres.add(t);
-            }
-        }
-        return possibleTheatres;
+        return StreamSupport.stream(allTheatres.spliterator(), false)
+                            .filter(t -> t.getMoviesPlayingHere().containsAll(desiredMovies))
+                            .collect(Collectors.toList());
     }
 
     private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
