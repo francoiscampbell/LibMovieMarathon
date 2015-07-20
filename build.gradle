@@ -1,15 +1,26 @@
+plugins {
+    id "me.tatarka.retrolambda" version "3.2.0"
+    id "java"
+}
+
 group 'io.github.francoiscampbell'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'java'
-
 //noinspection GroovyUnusedAssignment
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
     maven {
-        url  "http://dl.bintray.com/francoiscampbell/maven"
+        url "http://dl.bintray.com/francoiscampbell/maven"
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            exclude 'io/github/francoiscampbell/Main.java'
+        }
     }
 }
 
