@@ -22,18 +22,14 @@ public class Showtime implements Comparable<Showtime> {
     private Movie movie;
 
     /**
-     * 
-     * @return
-     *     The theatre
+     * @return The theatre
      */
     public Theatre getTheatre() {
         return theatre;
     }
 
     /**
-     *
-     * @param theatre
-     *     The theatre
+     * @param theatre The theatre
      */
     public void setTheatre(Theatre theatre) {
         this.theatre = theatre;
@@ -45,18 +41,14 @@ public class Showtime implements Comparable<Showtime> {
     }
 
     /**
-     * 
-     * @return
-     *     The dateTime
+     * @return The dateTime
      */
     public DateTime getDateTime() {
         return dateTime;
     }
 
     /**
-     * 
-     * @param dateTime
-     *     The dateTime
+     * @param dateTime The dateTime
      */
     public void setDateTime(DateTime dateTime) {
         this.dateTime = dateTime;
@@ -68,18 +60,14 @@ public class Showtime implements Comparable<Showtime> {
     }
 
     /**
-     * 
-     * @return
-     *     The quals
+     * @return The quals
      */
     public String getQuals() {
         return quals;
     }
 
     /**
-     * 
-     * @param quals
-     *     The quals
+     * @param quals The quals
      */
     public void setQuals(String quals) {
         this.quals = quals;
@@ -91,18 +79,14 @@ public class Showtime implements Comparable<Showtime> {
     }
 
     /**
-     * 
-     * @return
-     *     The barg
+     * @return The barg
      */
     public boolean isBarg() {
         return barg;
     }
 
     /**
-     * 
-     * @param barg
-     *     The barg
+     * @param barg The barg
      */
     public void setBarg(boolean barg) {
         this.barg = barg;
@@ -121,35 +105,40 @@ public class Showtime implements Comparable<Showtime> {
         this.movie = movie;
     }
 
-    public DateTime getStartDateTime() {
+    public DateTime getStartDateTime(boolean includePreviewsLength) {
+        if (includePreviewsLength) {
+            return dateTime.plus(movie.getPreviewsLength());
+        }
         return dateTime;
     }
 
-    public DateTime getEndDateTime() {
-        return dateTime.plus(getMovie().getTotalLength());
+    public DateTime getEndDateTime(boolean includePreviewsLength) {
+        return getStartDateTime(includePreviewsLength).plus(getMovie().getRunTime());
     }
 
-    public String getStartTimeString() {
-        return String.format("%02d:%02d", dateTime.getHourOfDay(), dateTime.getMinuteOfHour());
+    public String getStartTimeString(boolean includePreviewsLength) {
+        DateTime startDateTime = getStartDateTime(includePreviewsLength);
+        return String.format("%02d:%02d", startDateTime.getHourOfDay(), startDateTime.getMinuteOfHour());
     }
 
-    public String getEndTimeString() {
-        DateTime endTime = getEndDateTime();
-        return String.format("%02d:%02d", endTime.getHourOfDay(), endTime.getMinuteOfHour());
+    public String getEndTimeString(boolean includePreviewsLength) {
+        DateTime endDateTime = getEndDateTime(includePreviewsLength);
+        return String.format("%02d:%02d", endDateTime.getHourOfDay(), endDateTime.getMinuteOfHour());
     }
 
     @Override
     public int compareTo(@NotNull Showtime o) {
-        return dateTime.compareTo(o.getStartDateTime());
+        return dateTime.compareTo(o.getStartDateTime(true));
     }
 
     @Override
     public String toString() {
-        return dateTime.toString() + "-" + getEndDateTime().toString() + " " + getMovie().toString();
+        return dateTime.toString() + "-" + getEndDateTime(false).toString() + " " + getMovie().toString();
     }
 
-    public String toFriendlyString() {
-        return getStartTimeString() + "-" + getEndTimeString() + " " + getMovie().toString();
+    public String toFriendlyString(boolean includePreviewsLength) {
+        return getStartTimeString(includePreviewsLength) + "-" + getEndTimeString(includePreviewsLength) + " " + getMovie()
+                .toString();
     }
 
     @Override

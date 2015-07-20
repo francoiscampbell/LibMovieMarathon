@@ -461,8 +461,11 @@ public class Movie {
         return previewsLength;
     }
 
-    public Duration getTotalLength() {
-        return getRunTime().plus(getPreviewsLength());
+    public Duration getTotalLength(boolean includePreviewsLength) {
+        if (includePreviewsLength) {
+            return getRunTime().plus(getPreviewsLength());
+        }
+        return getRunTime();
     }
 
     @Override

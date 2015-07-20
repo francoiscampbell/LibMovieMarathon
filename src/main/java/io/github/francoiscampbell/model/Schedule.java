@@ -16,22 +16,22 @@ public class Schedule {
     private Map<Showtime, Duration> delays;
     private Duration totalDelay;
 
-    public Schedule(Deque<Showtime> showtimes, Theatre theatre) {
+    public Schedule(Deque<Showtime> showtimes, Theatre theatre, boolean ignorePreviewsLength) {
         this.showtimes = new LinkedList<>(showtimes);
         this.theatre = theatre;
-        this.delays = calculateDelays(showtimes);
+        this.delays = calculateDelays(showtimes, ignorePreviewsLength);
         this.totalDelay = calculateTotalDelay();
     }
 
-    private Map<Showtime, Duration> calculateDelays(Deque<Showtime> showtimes) {
+    private Map<Showtime, Duration> calculateDelays(Deque<Showtime> showtimes, boolean includePreviewsLength) {
         Map<Showtime, Duration> delays = new LinkedHashMap<>();
         Iterator<Showtime> iterator = showtimes.iterator();
         Showtime next = iterator.next();
         while (iterator.hasNext()) {
             Showtime current = next;
             next = iterator.next();
-            DateTime endTime = current.getEndDateTime();
-            DateTime nextStartTime = next.getStartDateTime();
+            DateTime endTime = current.getEndDateTime(includePreviewsLength);
+            DateTime nextStartTime = next.getStartDateTime(includePreviewsLength);
             delays.put(current, new Duration(endTime, nextStartTime));
         }
         return delays;

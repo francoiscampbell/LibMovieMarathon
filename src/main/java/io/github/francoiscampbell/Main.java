@@ -14,18 +14,11 @@ import java.util.*;
 import java.util.List;
 
 /**
- * Created by francois on 15-07-02.
+ * Main
+ * This class is a placeholder for a real application. It's just used to develop the logic
+ * TODO: Refactor to make this a proper application
  */
 public class Main {
-
-
-    /**
-     * Main
-     * This class is a placeholder for a real application. It's just used to develop the logic
-     * TODO: Refactor to make this a proper application
-     */
-    public Main() {
-    }
 
     public static void main(String[] args) {
         new Main().start();
@@ -41,10 +34,38 @@ public class Main {
         ScheduleGenerator.Builder builder = new ScheduleGenerator.Builder(allMovies);
         do {
             List<Movie> desiredMovies = selectMovies(allMovies);
-            builder.desiredMovies(desiredMovies).sortByDelay(true);
+            builder.desiredMovies(desiredMovies);
+            chooseParameters(builder);
+
+
             List<Schedule> possibleSchedules = builder.build().generateSchedules();
             printSchedules(possibleSchedules);
         } while (!quit());
+    }
+
+    private void chooseParameters(ScheduleGenerator.Builder builder) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Sort by delay?");
+        boolean sortByDelay = scanner.nextBoolean();
+
+        System.out.println("Include previews length?");
+        boolean includePreviewsLength = scanner.nextBoolean();
+
+        System.out.println("Maximum overlap minutes:");
+        int maxOverlap = scanner.nextInt();
+
+        System.out.println("Maximum delay minutes between movies:");
+        int maxIndividualDelay = scanner.nextInt();
+
+        System.out.println("Maximum total delay minutes:");
+        int maxTotalDelay = scanner.nextInt();
+
+        builder.sortByDelay(sortByDelay)
+               .includePreviewsLength(includePreviewsLength)
+               .maxOverlap(Duration.standardMinutes(maxOverlap))
+               .maxIndividualDelay(Duration.standardMinutes(maxIndividualDelay))
+               .maxTotalDelay(Duration.standardMinutes(maxTotalDelay));
     }
 
     private boolean quit() {
@@ -117,7 +138,7 @@ public class Main {
             difference = maxDelay.minus(minDelay);
 
             for (Showtime showtime : schedule.getShowtimes()) {
-                System.out.println("\t" + showtime.toFriendlyString());
+                System.out.println("\t" + showtime.toFriendlyString(true));
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
                 if (delay != null) {
                     float ratio = MoreMath.protectedDivide(delay.minus(minDelay)
@@ -125,7 +146,8 @@ public class Main {
 
                     Color lerp = colorLerp(Color.GREEN, Color.RED, ratio);
 //                    System.out.println("lerp = " + lerp);
-                    System.out.println("\tDelay of " + delay.getStandardMinutes() + " minutes");
+                    String plural = delay.getStandardMinutes() == 1 ? " minute" : " minutes";
+                    System.out.println("\tDelay of " + delay.getStandardMinutes() + plural);
                 }
             }
         }

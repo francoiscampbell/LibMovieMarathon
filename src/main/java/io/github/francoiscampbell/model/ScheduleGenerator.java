@@ -5,6 +5,7 @@ import io.github.francoiscampbell.apimodel.Showtime;
 import io.github.francoiscampbell.apimodel.Theatre;
 import io.github.francoiscampbell.collections.SelfMap;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import java.util.*;
 
@@ -17,13 +18,20 @@ public class ScheduleGenerator {
 
     private List<Movie> desiredMovies;
     private boolean sortByDelay;
+    private boolean includePreviewsLength;
+    private DateTime earliestTime;
+    private DateTime latestTime;
+    private Duration maxIndividualDelay;
+    private Duration maxTotalDelay;
+    private Duration maxOverlap;
+
 
     public List<Schedule> generateSchedules() {
         possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
         List<Schedule> possibleSchedules = new ArrayList<>();
         Deque<Showtime> currentPermutation = new LinkedList<>();
         for (Theatre t : possibleTheatres) {
-            generateSchedule(t, desiredMovies, new DateTime(0), possibleSchedules, currentPermutation);
+            generateSchedule(t, desiredMovies, earliestTime, possibleSchedules, currentPermutation);
         }
         if (sortByDelay) {
             sortSchedulesByDelay(possibleSchedules);
@@ -47,7 +55,10 @@ public class ScheduleGenerator {
 
     private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
         if (movies.size() == 0) { //end condition for recursive algorithm
-            possibleSchedules.add(new Schedule(currentPermutation, theatre));
+            Schedule currentSchedule = new Schedule(currentPermutation, theatre, includePreviewsLength);
+            if (validateSchedule(currentSchedule)) {
+                possibleSchedules.add(currentSchedule);
+            }
             return;
         }
         for (Movie movie : movies) {
@@ -57,23 +68,43 @@ public class ScheduleGenerator {
                 currentPermutation.add(showtime);
                 List<Movie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
-                nextAvailableStartTime = showtime.getStartDateTime()
-                                                 .plus(movie.getTotalLength());
+                nextAvailableStartTime = showtime.getStartDateTime(includePreviewsLength)
+                                                 .plus(movie.getRunTime());
                 generateSchedule(theatre, remainingMovies, nextAvailableStartTime, possibleSchedules, currentPermutation);
                 currentPermutation.removeLast();
             }
         }
     }
 
+    private boolean validateSchedule(Schedule schedule) {
+        if (maxTotalDelay != null && schedule.getTotalDelay().isLongerThan(maxTotalDelay)) {
+            return false;
+        }
+        if (maxIndividualDelay != null && schedule.getDelays().size() > 0
+                && Collections.max(schedule.getDelays().values()).isLongerThan(maxIndividualDelay)) {
+            return false;
+        }
+        return true;
+    }
+
     private Showtime findNextShowtimeForMovie(Theatre theatre, Movie movie, DateTime startTime) {
         for (Showtime showtime : theatre.getShowtimes()) {
-            DateTime dateTime = showtime.getStartDateTime();
-            if (showtime.getMovie()
-                        .equals(movie) && dateTime.isAfter(startTime)) {
+            if (showtime.getMovie().equals(movie)
+                    && validateShowtime(showtime, startTime)) {
                 return showtime;
             }
         }
         return null;
+    }
+
+    private boolean validateShowtime(Showtime showtime, DateTime startTime) {
+        if (showtime.getStartDateTime(includePreviewsLength).isBefore(startTime.minus(maxOverlap))) {
+            return false;
+        }
+        if (latestTime != null && showtime.getEndDateTime(includePreviewsLength).isAfter(latestTime)) {
+            return false;
+        }
+        return true;
     }
 
     public static class Builder {
@@ -81,6 +112,8 @@ public class ScheduleGenerator {
 
         public Builder(List<Movie> allMovies) {
             scheduleGenerator = new ScheduleGenerator();
+            scheduleGenerator.earliestTime = new DateTime(0);
+
             scheduleGenerator.allTheatres = reorganizeMoviesIntoModel(allMovies);
         }
 
@@ -91,6 +124,36 @@ public class ScheduleGenerator {
 
         public Builder sortByDelay(boolean sortByDelay) {
             scheduleGenerator.sortByDelay = sortByDelay;
+            return this;
+        }
+
+        public Builder includePreviewsLength(boolean includePreviewsLength) {
+            scheduleGenerator.includePreviewsLength = includePreviewsLength;
+            return this;
+        }
+
+        public Builder earliestTime(DateTime earliestTime) {
+            scheduleGenerator.earliestTime = earliestTime;
+            return this;
+        }
+
+        public Builder latestTime(DateTime latestTime) {
+            scheduleGenerator.latestTime = latestTime;
+            return this;
+        }
+
+        public Builder maxIndividualDelay(Duration maxIndividualDelay) {
+            scheduleGenerator.maxIndividualDelay = maxIndividualDelay;
+            return this;
+        }
+
+        public Builder maxTotalDelay(Duration maxTotalDelay) {
+            scheduleGenerator.maxTotalDelay = maxTotalDelay;
+            return this;
+        }
+
+        public Builder maxOverlap(Duration maxOverlap) {
+            scheduleGenerator.maxOverlap = maxOverlap;
             return this;
         }
 
