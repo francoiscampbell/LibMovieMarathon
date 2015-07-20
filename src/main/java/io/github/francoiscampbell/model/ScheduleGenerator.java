@@ -14,7 +14,6 @@ import java.util.*;
  */
 public class ScheduleGenerator {
     private List<Theatre> allTheatres;
-    private List<Theatre> possibleTheatres;
 
     private List<Movie> desiredMovies;
     private boolean sortByDelay;
@@ -27,7 +26,7 @@ public class ScheduleGenerator {
 
 
     public List<Schedule> generateSchedules() {
-        possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
+        List<Theatre> possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
         List<Schedule> possibleSchedules = new ArrayList<>();
         Deque<Showtime> currentPermutation = new LinkedList<>();
         for (Theatre t : possibleTheatres) {
@@ -108,6 +107,7 @@ public class ScheduleGenerator {
     }
 
     public static class Builder {
+        private static final int MAX_OVERLAP_MINUTES = 100;
         private ScheduleGenerator scheduleGenerator;
 
         public Builder(List<Movie> allMovies) {
@@ -153,6 +153,9 @@ public class ScheduleGenerator {
         }
 
         public Builder maxOverlap(Duration maxOverlap) {
+            if (maxOverlap.getStandardMinutes() > MAX_OVERLAP_MINUTES) {
+                maxOverlap = Duration.standardMinutes(MAX_OVERLAP_MINUTES);
+            }
             scheduleGenerator.maxOverlap = maxOverlap;
             return this;
         }
