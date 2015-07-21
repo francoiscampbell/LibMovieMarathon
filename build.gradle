@@ -39,8 +39,8 @@ dependencies {
 }
 
 bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
+    user = project.BINTRAY_USER
+    key = project.BINTRAY_KEY
 
     configurations = ['default']
     publish = true

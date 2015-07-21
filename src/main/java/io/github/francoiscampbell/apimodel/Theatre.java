@@ -2,10 +2,11 @@
 package io.github.francoiscampbell.apimodel;
 
 import com.google.gson.annotations.Expose;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 import javax.annotation.Generated;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ public class Theatre {
     private String name;
 
     private List<Showtime> showtimes = new ArrayList<>();
+    private Set<Movie> moviesPlayingHere;
 
     /**
      * @return The id
@@ -66,11 +68,12 @@ public class Theatre {
     }
 
     public Set<Movie> getMoviesPlayingHere() {
-        Set<Movie> movies = new HashSet<>();
-        for (Showtime s : showtimes) {
-            movies.add(s.getMovie());
+        if (moviesPlayingHere == null) {
+            moviesPlayingHere = StreamSupport.stream(showtimes)
+                    .map(s -> s.getMovie())
+                    .collect(Collectors.toSet());
         }
-        return movies;
+        return moviesPlayingHere;
     }
 
     @Override

@@ -26,7 +26,6 @@ public class Main {
 
     public void start() {
         List<Movie> allMovies = getMovies();
-
         mainLoop(allMovies);
     }
 
