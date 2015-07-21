@@ -2,14 +2,16 @@
 package io.github.francoiscampbell.apimodel;
 
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
 import javax.annotation.Generated;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Generated("org.jsonschema2pojo")
-public class ApiMovie {
+public class Movie {
 
     @Expose
     private String tmsId;
@@ -22,7 +24,7 @@ public class ApiMovie {
     @Expose
     private int releaseYear;
     @Expose
-    private String releaseDate;
+    private DateTime releaseDate;
     @Expose
     private String titleLang;
     @Expose
@@ -30,515 +32,445 @@ public class ApiMovie {
     @Expose
     private String entityType;
     @Expose
-    private List<String> genres = new ArrayList<String>();
+    private List<String> genres = new ArrayList<>();
     @Expose
     private String longDescription;
     @Expose
     private String shortDescription;
     @Expose
-    private List<String> topCast = new ArrayList<String>();
+    private List<String> topCast = new ArrayList<>();
     @Expose
-    private List<String> directors = new ArrayList<String>();
+    private List<String> directors = new ArrayList<>();
     @Expose
     private String officialUrl;
     @Expose
-    @SerializedName("qualityRating")
-    private ApiQualityRating apiQualityRating;
+    private QualityRating qualityRating;
     @Expose
-    @SerializedName("ratings")
-    private List<ApiRating> apiRatings = new ArrayList<ApiRating>();
+    private List<Rating> ratings = new ArrayList<>();
     @Expose
-    private List<String> advisories = new ArrayList<String>();
+    private List<String> advisories = new ArrayList<>();
     @Expose
-    private String runTime;
+    private Duration runTime;
     @Expose
-    @SerializedName("preferredImage")
-    private ApiPreferredImage apiPreferredImage;
+    private PreferredImage preferredImage;
     @Expose
-    @SerializedName("showtimes")
-    private List<ApiShowtime> apiShowtimes = new ArrayList<ApiShowtime>();
+    private List<Showtime> showtimes = new ArrayList<>();
+
+    private Duration previewsLength = Duration.standardMinutes(15); //hardcoded previews length to 15
 
     /**
-     * 
-     * @return
-     *     The tmsId
+     * @return The tmsId
      */
     public String getTmsId() {
         return tmsId;
     }
 
     /**
-     * 
-     * @param tmsId
-     *     The tmsId
+     * @param tmsId The tmsId
      */
     public void setTmsId(String tmsId) {
         this.tmsId = tmsId;
     }
 
-    public ApiMovie withTmsId(String tmsId) {
+    public Movie withTmsId(String tmsId) {
         this.tmsId = tmsId;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The rootId
+     * @return The rootId
      */
     public String getRootId() {
         return rootId;
     }
 
     /**
-     * 
-     * @param rootId
-     *     The rootId
+     * @param rootId The rootId
      */
     public void setRootId(String rootId) {
         this.rootId = rootId;
     }
 
-    public ApiMovie withRootId(String rootId) {
+    public Movie withRootId(String rootId) {
         this.rootId = rootId;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The subType
+     * @return The subType
      */
     public String getSubType() {
         return subType;
     }
 
     /**
-     * 
-     * @param subType
-     *     The subType
+     * @param subType The subType
      */
     public void setSubType(String subType) {
         this.subType = subType;
     }
 
-    public ApiMovie withSubType(String subType) {
+    public Movie withSubType(String subType) {
         this.subType = subType;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The title
+     * @return The title
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * 
-     * @param title
-     *     The title
+     * @param title The title
      */
     public void setTitle(String title) {
         this.title = title;
     }
 
-    public ApiMovie withTitle(String title) {
+    public Movie withTitle(String title) {
         this.title = title;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The releaseYear
+     * @return The releaseYear
      */
     public int getReleaseYear() {
         return releaseYear;
     }
 
     /**
-     * 
-     * @param releaseYear
-     *     The releaseYear
+     * @param releaseYear The releaseYear
      */
     public void setReleaseYear(int releaseYear) {
         this.releaseYear = releaseYear;
     }
 
-    public ApiMovie withReleaseYear(int releaseYear) {
+    public Movie withReleaseYear(int releaseYear) {
         this.releaseYear = releaseYear;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The releaseDate
+     * @return The releaseDate
      */
-    public String getReleaseDate() {
+    public DateTime getReleaseDate() {
         return releaseDate;
     }
 
     /**
-     * 
-     * @param releaseDate
-     *     The releaseDate
+     * @param releaseDate The releaseDate
      */
-    public void setReleaseDate(String releaseDate) {
+    public void setReleaseDate(DateTime releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    public ApiMovie withReleaseDate(String releaseDate) {
+    public Movie withReleaseDate(DateTime releaseDate) {
         this.releaseDate = releaseDate;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The titleLang
+     * @return The titleLang
      */
     public String getTitleLang() {
         return titleLang;
     }
 
     /**
-     * 
-     * @param titleLang
-     *     The titleLang
+     * @param titleLang The titleLang
      */
     public void setTitleLang(String titleLang) {
         this.titleLang = titleLang;
     }
 
-    public ApiMovie withTitleLang(String titleLang) {
+    public Movie withTitleLang(String titleLang) {
         this.titleLang = titleLang;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The descriptionLang
+     * @return The descriptionLang
      */
     public String getDescriptionLang() {
         return descriptionLang;
     }
 
     /**
-     * 
-     * @param descriptionLang
-     *     The descriptionLang
+     * @param descriptionLang The descriptionLang
      */
     public void setDescriptionLang(String descriptionLang) {
         this.descriptionLang = descriptionLang;
     }
 
-    public ApiMovie withDescriptionLang(String descriptionLang) {
+    public Movie withDescriptionLang(String descriptionLang) {
         this.descriptionLang = descriptionLang;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The entityType
+     * @return The entityType
      */
     public String getEntityType() {
         return entityType;
     }
 
     /**
-     * 
-     * @param entityType
-     *     The entityType
+     * @param entityType The entityType
      */
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
 
-    public ApiMovie withEntityType(String entityType) {
+    public Movie withEntityType(String entityType) {
         this.entityType = entityType;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The genres
+     * @return The genres
      */
     public List<String> getGenres() {
         return genres;
     }
 
     /**
-     * 
-     * @param genres
-     *     The genres
+     * @param genres The genres
      */
     public void setGenres(List<String> genres) {
         this.genres = genres;
     }
 
-    public ApiMovie withGenres(List<String> genres) {
+    public Movie withGenres(List<String> genres) {
         this.genres = genres;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The longDescription
+     * @return The longDescription
      */
     public String getLongDescription() {
         return longDescription;
     }
 
     /**
-     * 
-     * @param longDescription
-     *     The longDescription
+     * @param longDescription The longDescription
      */
     public void setLongDescription(String longDescription) {
         this.longDescription = longDescription;
     }
 
-    public ApiMovie withLongDescription(String longDescription) {
+    public Movie withLongDescription(String longDescription) {
         this.longDescription = longDescription;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The shortDescription
+     * @return The shortDescription
      */
     public String getShortDescription() {
         return shortDescription;
     }
 
     /**
-     * 
-     * @param shortDescription
-     *     The shortDescription
+     * @param shortDescription The shortDescription
      */
     public void setShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
     }
 
-    public ApiMovie withShortDescription(String shortDescription) {
+    public Movie withShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The topCast
+     * @return The topCast
      */
     public List<String> getTopCast() {
         return topCast;
     }
 
     /**
-     * 
-     * @param topCast
-     *     The topCast
+     * @param topCast The topCast
      */
     public void setTopCast(List<String> topCast) {
         this.topCast = topCast;
     }
 
-    public ApiMovie withTopCast(List<String> topCast) {
+    public Movie withTopCast(List<String> topCast) {
         this.topCast = topCast;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The directors
+     * @return The directors
      */
     public List<String> getDirectors() {
         return directors;
     }
 
     /**
-     * 
-     * @param directors
-     *     The directors
+     * @param directors The directors
      */
     public void setDirectors(List<String> directors) {
         this.directors = directors;
     }
 
-    public ApiMovie withDirectors(List<String> directors) {
+    public Movie withDirectors(List<String> directors) {
         this.directors = directors;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The officialUrl
+     * @return The officialUrl
      */
     public String getOfficialUrl() {
         return officialUrl;
     }
 
     /**
-     * 
-     * @param officialUrl
-     *     The officialUrl
+     * @param officialUrl The officialUrl
      */
     public void setOfficialUrl(String officialUrl) {
         this.officialUrl = officialUrl;
     }
 
-    public ApiMovie withOfficialUrl(String officialUrl) {
+    public Movie withOfficialUrl(String officialUrl) {
         this.officialUrl = officialUrl;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The apiQualityRating
+     * @return The qualityRating
      */
-    public ApiQualityRating getApiQualityRating() {
-        return apiQualityRating;
+    public QualityRating getQualityRating() {
+        return qualityRating;
     }
 
     /**
-     * 
-     * @param apiQualityRating
-     *     The apiQualityRating
+     * @param qualityRating The qualityRating
      */
-    public void setApiQualityRating(ApiQualityRating apiQualityRating) {
-        this.apiQualityRating = apiQualityRating;
+    public void setQualityRating(QualityRating qualityRating) {
+        this.qualityRating = qualityRating;
     }
 
-    public ApiMovie withQualityRating(ApiQualityRating apiQualityRating) {
-        this.apiQualityRating = apiQualityRating;
+    public Movie withQualityRating(QualityRating qualityRating) {
+        this.qualityRating = qualityRating;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The apiRatings
+     * @return The ratings
      */
-    public List<ApiRating> getApiRatings() {
-        return apiRatings;
+    public List<Rating> getRatings() {
+        return ratings;
     }
 
     /**
-     * 
-     * @param apiRatings
-     *     The apiRatings
+     * @param ratings The ratings
      */
-    public void setApiRatings(List<ApiRating> apiRatings) {
-        this.apiRatings = apiRatings;
+    public void setRatings(List<Rating> ratings) {
+        this.ratings = ratings;
     }
 
-    public ApiMovie withRatings(List<ApiRating> apiRatings) {
-        this.apiRatings = apiRatings;
+    public Movie withRatings(List<Rating> ratings) {
+        this.ratings = ratings;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The advisories
+     * @return The advisories
      */
     public List<String> getAdvisories() {
         return advisories;
     }
 
     /**
-     * 
-     * @param advisories
-     *     The advisories
+     * @param advisories The advisories
      */
     public void setAdvisories(List<String> advisories) {
         this.advisories = advisories;
     }
 
-    public ApiMovie withAdvisories(List<String> advisories) {
+    public Movie withAdvisories(List<String> advisories) {
         this.advisories = advisories;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The runTime
+     * @return The runTime
      */
-    public String getRunTime() {
+    public Duration getRunTime() {
         return runTime;
     }
 
     /**
-     * 
-     * @param runTime
-     *     The runTime
+     * @param runTime The runTime
      */
-    public void setRunTime(String runTime) {
+    public void setRunTime(Duration runTime) {
         this.runTime = runTime;
     }
 
-    public ApiMovie withRunTime(String runTime) {
+    public Movie withRunTime(Duration runTime) {
         this.runTime = runTime;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The apiPreferredImage
+     * @return The preferredImage
      */
-    public ApiPreferredImage getApiPreferredImage() {
-        return apiPreferredImage;
+    public PreferredImage getPreferredImage() {
+        return preferredImage;
     }
 
     /**
-     * 
-     * @param apiPreferredImage
-     *     The apiPreferredImage
+     * @param preferredImage The preferredImage
      */
-    public void setApiPreferredImage(ApiPreferredImage apiPreferredImage) {
-        this.apiPreferredImage = apiPreferredImage;
+    public void setPreferredImage(PreferredImage preferredImage) {
+        this.preferredImage = preferredImage;
     }
 
-    public ApiMovie withPreferredImage(ApiPreferredImage apiPreferredImage) {
-        this.apiPreferredImage = apiPreferredImage;
+    public Movie withPreferredImage(PreferredImage preferredImage) {
+        this.preferredImage = preferredImage;
         return this;
     }
 
     /**
-     * 
-     * @return
-     *     The apiShowtimes
+     * @return The showtimes
      */
-    public List<ApiShowtime> getApiShowtimes() {
-        return apiShowtimes;
+    public List<Showtime> getShowtimes() {
+        return showtimes;
     }
 
     /**
-     * 
-     * @param apiShowtimes
-     *     The apiShowtimes
+     * @param showtimes The showtimes
      */
-    public void setApiShowtimes(List<ApiShowtime> apiShowtimes) {
-        this.apiShowtimes = apiShowtimes;
+    public void setShowtimes(List<Showtime> showtimes) {
+        this.showtimes = showtimes;
     }
 
-    public ApiMovie withShowtimes(List<ApiShowtime> apiShowtimes) {
-        this.apiShowtimes = apiShowtimes;
+    public Movie withShowtimes(List<Showtime> showtimes) {
+        this.showtimes = showtimes;
         return this;
+    }
+
+    public Duration getPreviewsLength() {
+        return previewsLength;
+    }
+
+    public Duration getTotalLength(boolean includePreviewsLength) {
+        if (includePreviewsLength) {
+            return getRunTime().plus(getPreviewsLength());
+        }
+        return getRunTime();
+    }
+
+    @Override
+    public String toString() {
+        return title;
     }
 
     @Override
@@ -546,11 +478,9 @@ public class ApiMovie {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ApiMovie apiMovie = (ApiMovie) o;
+        Movie movie = (Movie) o;
 
-        if (!tmsId.equals(apiMovie.tmsId)) return false;
-
-        return true;
+        return Objects.equals(tmsId, movie.tmsId);
     }
 
     @Override

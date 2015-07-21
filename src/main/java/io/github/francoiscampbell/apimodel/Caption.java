@@ -6,7 +6,7 @@ import com.google.gson.annotations.Expose;
 import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
-public class ApiCaption {
+public class Caption {
 
     @Expose
     private String content;
@@ -31,7 +31,7 @@ public class ApiCaption {
         this.content = content;
     }
 
-    public ApiCaption withContent(String content) {
+    public Caption withContent(String content) {
         this.content = content;
         return this;
     }
@@ -54,7 +54,7 @@ public class ApiCaption {
         this.lang = lang;
     }
 
-    public ApiCaption withLang(String lang) {
+    public Caption withLang(String lang) {
         this.lang = lang;
         return this;
     }

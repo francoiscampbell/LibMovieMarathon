@@ -2,3 +2,5 @@
 .idea/
 build/
 *.iml
+
+src/main/java/io/github/francoiscampbell/api/ApiKey.java
