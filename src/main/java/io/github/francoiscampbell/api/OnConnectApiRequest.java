@@ -5,7 +5,9 @@ import io.github.francoiscampbell.apimodel.*;
 import io.github.francoiscampbell.gson.*;
 import org.joda.time.*;
 import retrofit.*;
+import retrofit.client.*;
 import retrofit.converter.*;
+import retrofit.mime.*;
 
 import java.util.*;
 
@@ -85,6 +87,14 @@ public class OnConnectApiRequest {
 
         public Builder logLevel(RestAdapter.LogLevel logLevel) {
             endpointBuilder.setLogLevel(logLevel);
+            return this;
+        }
+
+        public Builder mockResponse(String mockResponse) {
+            Client mockClient = request -> new Response(request
+                    .getUrl(), 200, "nothing", Collections.EMPTY_LIST, new TypedByteArray("application/json", mockResponse
+                    .getBytes()));
+            endpointBuilder.setClient(mockClient);
             return this;
         }
 

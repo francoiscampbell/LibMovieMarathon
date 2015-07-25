@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'io.github.francoiscampbell'
-String versionNumber = '1.1.2'
+String versionNumber = '1.2.0'
 version versionNumber
 
 //noinspection GroovyUnusedAssignment
