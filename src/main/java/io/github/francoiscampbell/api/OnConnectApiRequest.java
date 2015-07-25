@@ -8,6 +8,7 @@ import retrofit.*;
 import retrofit.client.*;
 import retrofit.converter.*;
 import retrofit.mime.*;
+import rx.Observable;
 
 import java.util.*;
 
@@ -16,22 +17,34 @@ import java.util.*;
  */
 public class OnConnectApiRequest {
 
-    private MovieApi api;
+    private MovieApi movieApi;
+    private OmdbApi omdbApi;
     private Map<String, String> queryParams;
 
     public List<Movie> execute() {
-        return api.getMovies(queryParams);
+        List<Movie> movies = new LinkedList<>();
+        final Movie[] currentMovie = new Movie[1];
+        movieApi.getMovies(queryParams).flatMap(Observable::from)
+                .doOnNext(m -> currentMovie[0] = m)
+                .doOnNext(movies::add)
+                .flatMap(m -> omdbApi.getMovieInfo(m.getTitle()))
+                .doOnNext(m -> currentMovie[0].getPreferredImage().setUri(m.getPoster()))
+                .toBlocking()
+                .forEach(m -> System.out.println(currentMovie[0].getPreferredImage().getUri()));
+        return movies;
     }
 
     public void execute(Callback<List<Movie>> callback) {
-        api.getMovies(queryParams, callback);
+        movieApi.getMovies(queryParams, callback);
     }
 
     public static class Builder {
-        private static final String API_URL = "http://data.tmsapi.com";
+        private static final String ONCONNECT_API_URL = "http://data.tmsapi.com";
+        private static final String OMDB_API_URL = "http://www.omdbapi.com";
 
         private OnConnectApiRequest request;
-        private RestAdapter.Builder endpointBuilder;
+        private RestAdapter.Builder onConnectApiBuilder;
+        private RestAdapter.Builder omdbApiBuilder;
 
 
         public Builder(String startDate) {
@@ -44,9 +57,14 @@ public class OnConnectApiRequest {
                                          .registerTypeAdapter(Duration.class, new DurationConverter())
                                          .create();
 
-            endpointBuilder = new RestAdapter.Builder()
-                    .setEndpoint(API_URL)
+            onConnectApiBuilder = new RestAdapter.Builder()
+                    .setEndpoint(ONCONNECT_API_URL)
                     .setConverter(new GsonConverter(gson));
+
+            omdbApiBuilder = new RestAdapter.Builder()
+//                    .setLogLevel(RestAdapter.LogLevel.FULL)
+                    .setEndpoint(OMDB_API_URL);
+
         }
 
         public Builder apiKey(String apiKey) {
@@ -86,7 +104,7 @@ public class OnConnectApiRequest {
         }
 
         public Builder logLevel(RestAdapter.LogLevel logLevel) {
-            endpointBuilder.setLogLevel(logLevel);
+            onConnectApiBuilder.setLogLevel(logLevel);
             return this;
         }
 
@@ -94,12 +112,13 @@ public class OnConnectApiRequest {
             Client mockClient = request -> new Response(request
                     .getUrl(), 200, "nothing", Collections.EMPTY_LIST, new TypedByteArray("application/json", mockResponse
                     .getBytes()));
-            endpointBuilder.setClient(mockClient);
+            onConnectApiBuilder.setClient(mockClient);
             return this;
         }
 
         public OnConnectApiRequest build() {
-            request.api = endpointBuilder.build().create(MovieApi.class);
+            request.movieApi = onConnectApiBuilder.build().create(MovieApi.class);
+            request.omdbApi = omdbApiBuilder.build().create(OmdbApi.class);
             return request;
         }
 
