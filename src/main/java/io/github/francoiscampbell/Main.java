@@ -39,28 +39,9 @@ public class Main {
     }
 
     private void chooseParameters(ScheduleGenerator.Builder builder) {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Sort by delay?");
-        boolean sortByDelay = scanner.nextBoolean();
-
-        System.out.println("Include previews length?");
-        boolean includePreviewsLength = scanner.nextBoolean();
-
-        System.out.println("Maximum overlap minutes:");
-        int maxOverlap = scanner.nextInt();
-
-        System.out.println("Maximum delay minutes between movies:");
-        int maxIndividualDelay = scanner.nextInt();
-
-        System.out.println("Maximum total delay minutes:");
-        int maxTotalDelay = scanner.nextInt();
-
-        builder.sortByDelay(sortByDelay)
-               .includePreviewsLength(includePreviewsLength)
-               .maxOverlap(Duration.standardMinutes(maxOverlap))
-               .maxIndividualDelay(Duration.standardMinutes(maxIndividualDelay))
-               .maxTotalDelay(Duration.standardMinutes(maxTotalDelay));
+        builder.sortByDelay(true)
+               .includePreviewsLength(false)
+               .maxOverlap(Duration.standardMinutes(0));
     }
 
     private boolean quit() {
@@ -76,7 +57,7 @@ public class Main {
                 .postcode("M5T1N5")
 //                .radiusUnit(OnConnectApiRequest.RadiusUnit.KM)
                 .logLevel(RestAdapter.LogLevel.FULL)
-                .mockResponse(mockResponse)
+//                .mockResponse(mockResponse)
                 .build();
 
         return request.execute();

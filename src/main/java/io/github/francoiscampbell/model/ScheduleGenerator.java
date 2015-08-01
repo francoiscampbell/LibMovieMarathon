@@ -74,11 +74,11 @@ public class ScheduleGenerator {
     }
 
     private boolean validateSchedule(Schedule schedule) {
-        return maxTotalDelay != null
-                && schedule.getTotalDelay().isShorterThan(maxTotalDelay)
-                && maxIndividualDelay != null
-                && schedule.getDelays().size() > 0
-                && Collections.max(schedule.getDelays().values()).isShorterThan(maxIndividualDelay);
+        return (maxTotalDelay == null
+                || schedule.getTotalDelay().isShorterThan(maxTotalDelay))
+                && (maxIndividualDelay == null
+                || schedule.getDelays().size() == 0
+                || Collections.max(schedule.getDelays().values()).isShorterThan(maxIndividualDelay));
     }
 
     private Showtime findNextShowtimeForMovie(Theatre theatre, Movie movie, DateTime startTime) {
@@ -93,8 +93,8 @@ public class ScheduleGenerator {
 
     private boolean validateShowtime(Showtime showtime, DateTime startTime) {
         return showtime.getStartDateTime(includePreviewsLength).isAfter(startTime.minus(maxOverlap))
-                && latestTime != null
-                && showtime.getEndDateTime(includePreviewsLength).isBefore(latestTime);
+                && (latestTime == null
+                || showtime.getEndDateTime(includePreviewsLength).isBefore(latestTime));
     }
 
     public static class Builder {
