@@ -3,6 +3,7 @@ package io.github.francoiscampbell.api;
 import com.google.gson.*;
 import io.github.francoiscampbell.apimodel.*;
 import io.github.francoiscampbell.gson.*;
+import io.github.francoiscampbell.model.*;
 import org.joda.time.*;
 import retrofit.*;
 import retrofit.client.*;
@@ -19,12 +20,34 @@ public class OnConnectApiRequest {
     private MovieApi api;
     private Map<String, String> queryParams;
 
-    public List<Movie> execute() {
-        return api.getMovies(queryParams);
+    public ScheduleGenerator.Builder execute() {
+        List<Movie> allMovies = api.getMovies(queryParams);
+        removeUnplannableMovies(allMovies);
+        return new ScheduleGenerator.Builder(allMovies);
     }
 
-    public void execute(Callback<List<Movie>> callback) {
-        api.getMovies(queryParams, callback);
+    public void execute(Callback<ScheduleGenerator.Builder> callback) {
+        api.getMovies(queryParams, new Callback<List<Movie>>() {
+            @Override
+            public void success(List<Movie> allMovies, Response response) {
+                removeUnplannableMovies(allMovies);
+                ScheduleGenerator.Builder builder = new ScheduleGenerator.Builder(allMovies);
+                callback.success(builder, response);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                callback.failure(error);
+            }
+        });
+    }
+
+    private void removeUnplannableMovies(List<Movie> allMovies) {
+        for (Iterator<Movie> iterator = allMovies.iterator(); iterator.hasNext(); ) {
+            if (iterator.next().getRunTime() == null) {
+                iterator.remove();
+            }
+        }
     }
 
     public static class Builder {
@@ -92,7 +115,8 @@ public class OnConnectApiRequest {
 
         public Builder mockResponse(String mockResponse) {
             Client mockClient = request -> new Response(request
-                    .getUrl(), 200, "nothing", Collections.EMPTY_LIST, new TypedByteArray("application/json", mockResponse
+                    .getUrl(), 200, "nothing", Collections
+                    .emptyList(), new TypedByteArray("application/json", mockResponse
                     .getBytes()));
             endpointBuilder.setClient(mockClient);
             return this;

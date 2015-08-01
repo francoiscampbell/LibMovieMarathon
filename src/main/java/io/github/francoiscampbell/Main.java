@@ -24,19 +24,16 @@ public class Main {
     }
 
     public void start() {
-        List<Movie> allMovies = getMovies();
-        mainLoop(allMovies);
+        ScheduleGenerator.Builder builder = getScheduleGenarator();
+        mainLoop(builder);
     }
 
-    private void mainLoop(List<Movie> allMovies) {
-        ScheduleGenerator.Builder builder = new ScheduleGenerator.Builder(allMovies);
+    private void mainLoop(ScheduleGenerator.Builder builder) {
         do {
-            List<Movie> desiredMovies = selectMovies(allMovies);
-            builder.desiredMovies(desiredMovies);
             chooseParameters(builder);
-
-
-            List<Schedule> possibleSchedules = builder.build().generateSchedules();
+            ScheduleGenerator generator = builder.build();
+            List<Movie> desiredMovies = selectMovies(generator.getAllMovies());
+            List<Schedule> possibleSchedules = generator.generateSchedules(desiredMovies);
             printSchedules(possibleSchedules);
         } while (!quit());
     }
@@ -72,7 +69,7 @@ public class Main {
                                      .startsWith("q");
     }
 
-    private List<Movie> getMovies() {
+    private ScheduleGenerator.Builder getScheduleGenarator() {
         String currentDate = LocalDate.now().toString();
         OnConnectApiRequest request = new OnConnectApiRequest.Builder(currentDate)
                 .apiKey(ApiKey.API_KEY)
@@ -82,18 +79,9 @@ public class Main {
                 .mockResponse(mockResponse)
                 .build();
 
-        List<Movie> allMovies = request.execute();
-        removeUnplannableMovies(allMovies);
-        return allMovies;
+        return request.execute();
     }
 
-    private void removeUnplannableMovies(List<Movie> allMovies) {
-        for (Iterator<Movie> iterator = allMovies.iterator(); iterator.hasNext(); ) {
-            if (iterator.next().getRunTime() == null) {
-                iterator.remove();
-            }
-        }
-    }
 
     private List<Movie> selectMovies(List<Movie> movies) {
         System.out.println("Select movie: ");

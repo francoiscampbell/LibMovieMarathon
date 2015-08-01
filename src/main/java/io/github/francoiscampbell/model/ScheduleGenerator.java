@@ -11,9 +11,9 @@ import java.util.*;
  * Created by francois on 15-07-19.
  */
 public class ScheduleGenerator {
+    private List<Movie> allMovies;
     private List<Theatre> allTheatres;
 
-    private List<Movie> desiredMovies;
     private boolean sortByDelay;
     private boolean includePreviewsLength;
     private DateTime earliestTime;
@@ -22,8 +22,11 @@ public class ScheduleGenerator {
     private Duration maxTotalDelay;
     private Duration maxOverlap;
 
+    public List<Movie> getAllMovies() {
+        return allMovies;
+    }
 
-    public List<Schedule> generateSchedules() {
+    public List<Schedule> generateSchedules(List<Movie> desiredMovies) {
         List<Theatre> possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
         List<Schedule> possibleSchedules = new ArrayList<>();
         Deque<Showtime> currentPermutation = new LinkedList<>();
@@ -71,14 +74,11 @@ public class ScheduleGenerator {
     }
 
     private boolean validateSchedule(Schedule schedule) {
-        if (maxTotalDelay != null && schedule.getTotalDelay().isLongerThan(maxTotalDelay)) {
-            return false;
-        }
-        if (maxIndividualDelay != null && schedule.getDelays().size() > 0
-                && Collections.max(schedule.getDelays().values()).isLongerThan(maxIndividualDelay)) {
-            return false;
-        }
-        return true;
+        return maxTotalDelay != null
+                && schedule.getTotalDelay().isShorterThan(maxTotalDelay)
+                && maxIndividualDelay != null
+                && schedule.getDelays().size() > 0
+                && Collections.max(schedule.getDelays().values()).isShorterThan(maxIndividualDelay);
     }
 
     private Showtime findNextShowtimeForMovie(Theatre theatre, Movie movie, DateTime startTime) {
@@ -92,13 +92,9 @@ public class ScheduleGenerator {
     }
 
     private boolean validateShowtime(Showtime showtime, DateTime startTime) {
-        if (showtime.getStartDateTime(includePreviewsLength).isBefore(startTime.minus(maxOverlap))) {
-            return false;
-        }
-        if (latestTime != null && showtime.getEndDateTime(includePreviewsLength).isAfter(latestTime)) {
-            return false;
-        }
-        return true;
+        return showtime.getStartDateTime(includePreviewsLength).isAfter(startTime.minus(maxOverlap))
+                && latestTime != null
+                && showtime.getEndDateTime(includePreviewsLength).isBefore(latestTime);
     }
 
     public static class Builder {
@@ -108,13 +104,8 @@ public class ScheduleGenerator {
         public Builder(List<Movie> allMovies) {
             scheduleGenerator = new ScheduleGenerator();
             scheduleGenerator.earliestTime = new DateTime(0);
-
+            scheduleGenerator.allMovies = allMovies;
             scheduleGenerator.allTheatres = reorganizeMoviesIntoModel(allMovies);
-        }
-
-        public Builder desiredMovies(List<Movie> desiredMovies) {
-            scheduleGenerator.desiredMovies = desiredMovies;
-            return this;
         }
 
         public Builder sortByDelay(boolean sortByDelay) {
