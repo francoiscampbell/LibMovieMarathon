@@ -50,10 +50,10 @@ bintray {
         vcsUrl = 'https://github.com/francoiscampbell/MovieMarathon.git'
         //noinspection GroovyAssignabilityCheck
         version {
-            name = versionNumber
+            name = project.version
             desc = 'Library for planning movie marathons'
             released = new Date()
-            vcsTag = 'v' + versionNumber
+            vcsTag = 'v' + project.version
         }
     }
 }
