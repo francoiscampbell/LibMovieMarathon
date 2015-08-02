@@ -109,9 +109,9 @@ public class OnConnectApiRequest {
             return this;
         }
 
-        public Builder latlon(float lat, float lon) {
+        public Builder latlng(float lat, float lon) {
             request.queryParams.put("lat", String.valueOf(lat));
-            request.queryParams.put("lon", String.valueOf(lon));
+            request.queryParams.put("lng", String.valueOf(lon));
             return this;
         }
 
