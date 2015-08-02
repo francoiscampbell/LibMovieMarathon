@@ -10,6 +10,7 @@ import retrofit.client.*;
 import retrofit.converter.*;
 import retrofit.mime.*;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -55,6 +56,24 @@ public class OnConnectApiRequest {
             if (iterator.next().getRunTime() == null) {
                 iterator.remove();
             }
+        }
+    }
+
+    /**
+     * Created by francois on 15-07-10.
+     */
+    public enum RadiusUnit {
+        KM("km"),
+        MILES("mi");
+
+        private String unitString;
+
+        RadiusUnit(String unitString) {
+            this.unitString = unitString;
+        }
+
+        public String getUnitString() {
+            return unitString;
         }
     }
 
@@ -122,10 +141,21 @@ public class OnConnectApiRequest {
         }
 
         public Builder mockResponse(String mockResponse) {
-            Client mockClient = request -> new Response(request
-                    .getUrl(), 200, "nothing", Collections
-                    .emptyList(), new TypedByteArray("application/json", mockResponse
-                    .getBytes()));
+            Client mockClient = request -> new Response(request.getUrl(),
+                    200,
+                    "nothing",
+                    Collections.emptyList(),
+                    new TypedByteArray("application/json", mockResponse.getBytes()));
+            endpointBuilder.setClient(mockClient);
+            return this;
+        }
+
+        public Builder mockResponse(File mockResponseJsonFile) {
+            Client mockClient = request -> new Response(request.getUrl(),
+                    200,
+                    "nothing",
+                    Collections.emptyList(),
+                    new TypedFile("application/json", mockResponseJsonFile));
             endpointBuilder.setClient(mockClient);
             return this;
         }
@@ -133,24 +163,6 @@ public class OnConnectApiRequest {
         public OnConnectApiRequest build() {
             request.api = endpointBuilder.build().create(MovieApi.class);
             return request;
-        }
-
-        /**
-         * Created by francois on 15-07-10.
-         */
-        public enum RadiusUnit {
-            KM("km"),
-            MILES("mi");
-
-            private String unitString;
-
-            RadiusUnit(String unitString) {
-                this.unitString = unitString;
-            }
-
-            public String getUnitString() {
-                return unitString;
-            }
         }
     }
 }
