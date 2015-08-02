@@ -22,7 +22,7 @@ public class OnConnectApiRequest {
 
     public ScheduleGenerator.Builder execute() {
         List<Movie> allMovies = api.getMovies(queryParams);
-        removeUnplannableMovies(allMovies);
+        cleanupMovieList(allMovies);
         return new ScheduleGenerator.Builder(allMovies);
     }
 
@@ -30,7 +30,7 @@ public class OnConnectApiRequest {
         api.getMovies(queryParams, new Callback<List<Movie>>() {
             @Override
             public void success(List<Movie> allMovies, Response response) {
-                removeUnplannableMovies(allMovies);
+                cleanupMovieList(allMovies);
                 ScheduleGenerator.Builder builder = new ScheduleGenerator.Builder(allMovies);
                 callback.success(builder, response);
             }
@@ -40,6 +40,13 @@ public class OnConnectApiRequest {
                 callback.failure(error);
             }
         });
+    }
+
+    private void cleanupMovieList(List<Movie> movies) {
+        if (movies == null) {
+            movies = Collections.emptyList();
+        }
+        removeUnplannableMovies(movies);
     }
 
     private void removeUnplannableMovies(List<Movie> allMovies) {
