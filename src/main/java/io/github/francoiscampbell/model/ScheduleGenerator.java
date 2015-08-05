@@ -51,7 +51,8 @@ public class ScheduleGenerator {
     }
 
     private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
-        if (movies.size() == 0) { //end condition for recursive algorithm
+        if (movies.size() == 0 && !currentPermutation.isEmpty()) {
+            //end condition for recursive algorithm. check for empty to avoid generating a schedule if the list of desired movies is empty at the start
             Schedule currentSchedule = new Schedule(currentPermutation, theatre, includePreviewsLength);
             if (validateSchedule(currentSchedule)) {
                 possibleSchedules.add(currentSchedule);
