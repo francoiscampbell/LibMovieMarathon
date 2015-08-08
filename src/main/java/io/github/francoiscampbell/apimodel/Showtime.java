@@ -1,11 +1,11 @@
 
 package io.github.francoiscampbell.apimodel;
 
-import com.google.gson.annotations.Expose;
-import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateTime;
+import com.google.gson.annotations.*;
+import org.jetbrains.annotations.*;
+import org.joda.time.*;
 
-import javax.annotation.Generated;
+import javax.annotation.*;
 
 @Generated("org.jsonschema2pojo")
 public class Showtime implements Comparable<Showtime> {
@@ -112,8 +112,8 @@ public class Showtime implements Comparable<Showtime> {
         return dateTime;
     }
 
-    public DateTime getEndDateTime(boolean includePreviewsLength) {
-        return getStartDateTime(includePreviewsLength).plus(getMovie().getRunTime());
+    public DateTime getEndDateTime() {
+        return getStartDateTime(true).plus(getMovie().getRunTime());
     }
 
     public String getStartTimeString(boolean includePreviewsLength) {
@@ -121,8 +121,8 @@ public class Showtime implements Comparable<Showtime> {
         return String.format("%02d:%02d", startDateTime.getHourOfDay(), startDateTime.getMinuteOfHour());
     }
 
-    public String getEndTimeString(boolean includePreviewsLength) {
-        DateTime endDateTime = getEndDateTime(includePreviewsLength);
+    public String getEndTimeString() {
+        DateTime endDateTime = getEndDateTime();
         return String.format("%02d:%02d", endDateTime.getHourOfDay(), endDateTime.getMinuteOfHour());
     }
 
@@ -133,11 +133,11 @@ public class Showtime implements Comparable<Showtime> {
 
     @Override
     public String toString() {
-        return dateTime.toString() + "-" + getEndDateTime(false).toString() + " " + getMovie().toString();
+        return dateTime.toString() + "-" + getEndDateTime().toString() + " " + getMovie().toString();
     }
 
     public String toFriendlyString(boolean includePreviewsLength) {
-        return getStartTimeString(includePreviewsLength) + "-" + getEndTimeString(includePreviewsLength) + " " + getMovie()
+        return getStartTimeString(includePreviewsLength) + "-" + getEndTimeString() + " " + getMovie()
                 .toString();
     }
 

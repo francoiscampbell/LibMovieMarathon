@@ -95,7 +95,7 @@ public class ScheduleGenerator {
     private boolean validateShowtime(Showtime showtime, DateTime startTime) {
         return showtime.getStartDateTime(includePreviewsLength).isAfter(startTime.minus(maxOverlap))
                 && (latestTime == null
-                || showtime.getEndDateTime(includePreviewsLength).isBefore(latestTime));
+                || showtime.getEndDateTime().isBefore(latestTime));
     }
 
     public static class Builder {
