@@ -105,8 +105,8 @@ public class Showtime implements Comparable<Showtime> {
         this.movie = movie;
     }
 
-    public DateTime getStartDateTime(boolean includePreviewsLength) {
-        if (includePreviewsLength) {
+    public DateTime getStartDateTime(boolean ignorePreviews) {
+        if (ignorePreviews) {
             return dateTime.plus(movie.getPreviewsLength());
         }
         return dateTime;
@@ -116,8 +116,8 @@ public class Showtime implements Comparable<Showtime> {
         return getStartDateTime(true).plus(getMovie().getRunTime());
     }
 
-    public String getStartTimeString(boolean includePreviewsLength) {
-        DateTime startDateTime = getStartDateTime(includePreviewsLength);
+    public String getStartTimeString(boolean ignorePreviews) {
+        DateTime startDateTime = getStartDateTime(ignorePreviews);
         return String.format("%02d:%02d", startDateTime.getHourOfDay(), startDateTime.getMinuteOfHour());
     }
 
@@ -136,8 +136,8 @@ public class Showtime implements Comparable<Showtime> {
         return dateTime.toString() + "-" + getEndDateTime().toString() + " " + getMovie().toString();
     }
 
-    public String toFriendlyString(boolean includePreviewsLength) {
-        return getStartTimeString(includePreviewsLength) + "-" + getEndTimeString() + " " + getMovie()
+    public String toFriendlyString(boolean ignorePreviews) {
+        return getStartTimeString(ignorePreviews) + "-" + getEndTimeString() + " " + getMovie()
                 .toString();
     }
 

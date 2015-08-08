@@ -15,7 +15,7 @@ public class ScheduleGenerator {
     private List<Theatre> allTheatres;
 
     private boolean sortByDelay;
-    private boolean includePreviewsLength;
+    private boolean ignorePreviews;
     private DateTime earliestTime;
     private DateTime latestTime;
     private Duration maxIndividualDelay;
@@ -53,7 +53,7 @@ public class ScheduleGenerator {
     private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
         if (movies.size() == 0 && !currentPermutation.isEmpty()) {
             //end condition for recursive algorithm. check for empty to avoid generating a schedule if the list of desired movies is empty at the start
-            Schedule currentSchedule = new Schedule(currentPermutation, theatre, includePreviewsLength);
+            Schedule currentSchedule = new Schedule(currentPermutation, theatre, ignorePreviews);
             if (validateSchedule(currentSchedule)) {
                 possibleSchedules.add(currentSchedule);
             }
@@ -66,7 +66,7 @@ public class ScheduleGenerator {
                 currentPermutation.add(showtime);
                 List<Movie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
-                nextAvailableStartTime = showtime.getStartDateTime(includePreviewsLength)
+                nextAvailableStartTime = showtime.getStartDateTime(ignorePreviews)
                                                  .plus(movie.getRunTime());
                 generateSchedule(theatre, remainingMovies, nextAvailableStartTime, possibleSchedules, currentPermutation);
                 currentPermutation.removeLast();
@@ -93,7 +93,7 @@ public class ScheduleGenerator {
     }
 
     private boolean validateShowtime(Showtime showtime, DateTime startTime) {
-        return showtime.getStartDateTime(includePreviewsLength).isAfter(startTime.minus(maxOverlap))
+        return showtime.getStartDateTime(ignorePreviews).isAfter(startTime.minus(maxOverlap))
                 && (latestTime == null
                 || showtime.getEndDateTime().isBefore(latestTime));
     }
@@ -114,8 +114,8 @@ public class ScheduleGenerator {
             return this;
         }
 
-        public Builder includePreviewsLength(boolean includePreviewsLength) {
-            scheduleGenerator.includePreviewsLength = includePreviewsLength;
+        public Builder ignorePreviews(boolean ignorePreviews) {
+            scheduleGenerator.ignorePreviews = ignorePreviews;
             return this;
         }
 

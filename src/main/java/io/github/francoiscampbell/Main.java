@@ -6,7 +6,6 @@ import io.github.francoiscampbell.model.*;
 import org.joda.time.*;
 
 import java.awt.*;
-import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class Main {
 
     private void chooseParameters(ScheduleGenerator.Builder builder) {
         builder.sortByDelay(true)
-               .includePreviewsLength(false)
+               .ignorePreviews(false)
                .maxOverlap(Duration.standardMinutes(0));
     }
 
@@ -54,7 +53,7 @@ public class Main {
                 .postcode("M5T 1N5")
                 .radiusUnit(OnConnectApiRequest.RadiusUnit.KM)
 //                .logLevel(RestAdapter.LogLevel.FULL)
-                .mockResponse(new File("mockResponse.json"))
+//                .mockResponse(new File("mockResponse.json"))
                 .build();
 
         return request.execute();
@@ -104,7 +103,7 @@ public class Main {
             difference = maxDelay.minus(minDelay);
 
             for (Showtime showtime : schedule.getShowtimes()) {
-                System.out.println("\t" + showtime.toFriendlyString(true));
+                System.out.println("\t" + showtime.toFriendlyString(false));
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
                 if (delay != null) {
                     float ratio = MoreMath.protectedDivide(delay.minus(minDelay)
