@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'io.github.francoiscampbell'
-version '1.4.1'
+version '1.4.2'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = 1.8

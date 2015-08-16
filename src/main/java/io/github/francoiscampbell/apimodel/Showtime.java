@@ -128,7 +128,7 @@ public class Showtime implements Comparable<Showtime> {
 
     @Override
     public int compareTo(@NotNull Showtime o) {
-        return dateTime.compareTo(o.getStartDateTime(true));
+        return dateTime.compareTo(o.getStartDateTime(false));
     }
 
     @Override
