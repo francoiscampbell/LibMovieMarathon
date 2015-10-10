@@ -1,9 +1,7 @@
 package io.github.francoiscampbell.model;
 
-import io.github.francoiscampbell.apimodel.Showtime;
-import io.github.francoiscampbell.apimodel.Theatre;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
+import io.github.francoiscampbell.apimodel.*;
+import org.joda.time.*;
 
 import java.util.*;
 
@@ -16,21 +14,24 @@ public class Schedule {
     private Map<Showtime, Duration> delays;
     private Duration totalDelay;
 
-    public Schedule(Deque<Showtime> showtimes, Theatre theatre, boolean ignorePreviewsLength) {
+    public Schedule(Deque<Showtime> showtimes, Theatre theatre, boolean includePreviewsLength) {
         this.showtimes = new LinkedList<>(showtimes);
         this.theatre = theatre;
-        this.delays = calculateDelays(showtimes, ignorePreviewsLength);
+        this.delays = calculateDelays(showtimes, includePreviewsLength);
         this.totalDelay = calculateTotalDelay();
     }
 
     private Map<Showtime, Duration> calculateDelays(Deque<Showtime> showtimes, boolean includePreviewsLength) {
+        if (showtimes.isEmpty()) {
+            return Collections.emptyMap();
+        }
         Map<Showtime, Duration> delays = new LinkedHashMap<>();
         Iterator<Showtime> iterator = showtimes.iterator();
         Showtime next = iterator.next();
         while (iterator.hasNext()) {
             Showtime current = next;
             next = iterator.next();
-            DateTime endTime = current.getEndDateTime(includePreviewsLength);
+            DateTime endTime = current.getEndDateTime();
             DateTime nextStartTime = next.getStartDateTime(includePreviewsLength);
             delays.put(current, new Duration(endTime, nextStartTime));
         }

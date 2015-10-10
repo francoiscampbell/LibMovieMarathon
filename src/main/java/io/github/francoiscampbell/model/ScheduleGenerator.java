@@ -11,19 +11,22 @@ import java.util.*;
  * Created by francois on 15-07-19.
  */
 public class ScheduleGenerator {
+    private List<Movie> allMovies;
     private List<Theatre> allTheatres;
 
-    private List<Movie> desiredMovies;
     private boolean sortByDelay;
-    private boolean includePreviewsLength;
+    private boolean ignorePreviews;
     private DateTime earliestTime;
     private DateTime latestTime;
     private Duration maxIndividualDelay;
     private Duration maxTotalDelay;
     private Duration maxOverlap;
 
+    public List<Movie> getAllMovies() {
+        return allMovies;
+    }
 
-    public List<Schedule> generateSchedules() {
+    public List<Schedule> generateSchedules(List<Movie> desiredMovies) {
         List<Theatre> possibleTheatres = calculatePossibleTheatres(allTheatres, desiredMovies);
         List<Schedule> possibleSchedules = new ArrayList<>();
         Deque<Showtime> currentPermutation = new LinkedList<>();
@@ -48,8 +51,9 @@ public class ScheduleGenerator {
     }
 
     private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
-        if (movies.size() == 0) { //end condition for recursive algorithm
-            Schedule currentSchedule = new Schedule(currentPermutation, theatre, includePreviewsLength);
+        if (movies.size() == 0 && !currentPermutation.isEmpty()) {
+            //end condition for recursive algorithm. check for empty to avoid generating a schedule if the list of desired movies is empty at the start
+            Schedule currentSchedule = new Schedule(currentPermutation, theatre, ignorePreviews);
             if (validateSchedule(currentSchedule)) {
                 possibleSchedules.add(currentSchedule);
             }
@@ -62,7 +66,7 @@ public class ScheduleGenerator {
                 currentPermutation.add(showtime);
                 List<Movie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
-                nextAvailableStartTime = showtime.getStartDateTime(includePreviewsLength)
+                nextAvailableStartTime = showtime.getStartDateTime(ignorePreviews)
                                                  .plus(movie.getRunTime());
                 generateSchedule(theatre, remainingMovies, nextAvailableStartTime, possibleSchedules, currentPermutation);
                 currentPermutation.removeLast();
@@ -71,14 +75,11 @@ public class ScheduleGenerator {
     }
 
     private boolean validateSchedule(Schedule schedule) {
-        if (maxTotalDelay != null && schedule.getTotalDelay().isLongerThan(maxTotalDelay)) {
-            return false;
-        }
-        if (maxIndividualDelay != null && schedule.getDelays().size() > 0
-                && Collections.max(schedule.getDelays().values()).isLongerThan(maxIndividualDelay)) {
-            return false;
-        }
-        return true;
+        return (maxTotalDelay == null
+                || schedule.getTotalDelay().isShorterThan(maxTotalDelay))
+                && (maxIndividualDelay == null
+                || schedule.getDelays().size() == 0
+                || Collections.max(schedule.getDelays().values()).isShorterThan(maxIndividualDelay));
     }
 
     private Showtime findNextShowtimeForMovie(Theatre theatre, Movie movie, DateTime startTime) {
@@ -92,13 +93,9 @@ public class ScheduleGenerator {
     }
 
     private boolean validateShowtime(Showtime showtime, DateTime startTime) {
-        if (showtime.getStartDateTime(includePreviewsLength).isBefore(startTime.minus(maxOverlap))) {
-            return false;
-        }
-        if (latestTime != null && showtime.getEndDateTime(includePreviewsLength).isAfter(latestTime)) {
-            return false;
-        }
-        return true;
+        return showtime.getStartDateTime(ignorePreviews).isAfter(startTime.minus(maxOverlap))
+                && (latestTime == null
+                || showtime.getEndDateTime().isBefore(latestTime));
     }
 
     public static class Builder {
@@ -108,13 +105,8 @@ public class ScheduleGenerator {
         public Builder(List<Movie> allMovies) {
             scheduleGenerator = new ScheduleGenerator();
             scheduleGenerator.earliestTime = new DateTime(0);
-
+            scheduleGenerator.allMovies = allMovies;
             scheduleGenerator.allTheatres = reorganizeMoviesIntoModel(allMovies);
-        }
-
-        public Builder desiredMovies(List<Movie> desiredMovies) {
-            scheduleGenerator.desiredMovies = desiredMovies;
-            return this;
         }
 
         public Builder sortByDelay(boolean sortByDelay) {
@@ -122,8 +114,8 @@ public class ScheduleGenerator {
             return this;
         }
 
-        public Builder includePreviewsLength(boolean includePreviewsLength) {
-            scheduleGenerator.includePreviewsLength = includePreviewsLength;
+        public Builder ignorePreviews(boolean ignorePreviews) {
+            scheduleGenerator.ignorePreviews = ignorePreviews;
             return this;
         }
 

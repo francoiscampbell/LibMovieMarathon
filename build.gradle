@@ -6,8 +6,7 @@ plugins {
 }
 
 group 'io.github.francoiscampbell'
-String versionNumber = '1.2.0'
-version versionNumber
+version '1.4.2'
 
 //noinspection GroovyUnusedAssignment
 sourceCompatibility = 1.8
@@ -52,10 +51,10 @@ bintray {
         vcsUrl = 'https://github.com/francoiscampbell/MovieMarathon.git'
         //noinspection GroovyAssignabilityCheck
         version {
-            name = versionNumber
+            name = project.version
             desc = 'Library for planning movie marathons'
             released = new Date()
-            vcsTag = 'v' + versionNumber
+            vcsTag = 'v' + project.version
         }
     }
 }
