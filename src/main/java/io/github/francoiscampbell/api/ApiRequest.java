@@ -1,15 +1,24 @@
 package io.github.francoiscampbell.api;
 
-import com.google.gson.*;
-import io.github.francoiscampbell.apimodel.*;
-import io.github.francoiscampbell.gson.*;
-import org.joda.time.*;
-import retrofit.*;
-import retrofit.client.*;
-import retrofit.converter.*;
-import retrofit.mime.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.github.francoiscampbell.apimodel.Movie;
+import io.github.francoiscampbell.gson.DateTimeConverter;
+import io.github.francoiscampbell.gson.DurationConverter;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import retrofit.RestAdapter;
+import retrofit.client.Client;
+import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
+import retrofit.mime.TypedByteArray;
+import retrofit.mime.TypedFile;
+import rx.Observable;
 
-import java.util.*;
+import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by francois on 15-07-10.
@@ -29,6 +38,21 @@ public class ApiRequest {
                                                 return m;
                                             })
                        );
+    }
+
+    public enum RadiusUnit {
+        KM("km"),
+        MILES("mi");
+
+        private String unitString;
+
+        RadiusUnit(String unitString) {
+            this.unitString = unitString;
+        }
+
+        public String getUnitString() {
+            return unitString;
+        }
     }
 
     public static class Builder {
@@ -116,13 +140,14 @@ public class ApiRequest {
                     "nothing",
                     Collections.emptyList(),
                     new TypedFile("application/json", mockResponseJsonFile));
-            endpointBuilder.setClient(mockClient);
+            onConnectApiBuilder.setClient(mockClient);
+            return this;
         }
 
         public ApiRequest build() {
             request.movieApi = onConnectApiBuilder.build().create(MovieApi.class);
             request.omdbApi = omdbApiBuilder.build().create(OmdbApi.class);
-            return this;
+            return this.request;
         }
     }
 }

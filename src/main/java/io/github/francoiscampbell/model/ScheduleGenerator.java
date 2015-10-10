@@ -1,11 +1,19 @@
 package io.github.francoiscampbell.model;
 
-import io.github.francoiscampbell.apimodel.*;
-import io.github.francoiscampbell.collections.*;
-import java8.util.stream.*;
-import org.joda.time.*;
+import io.github.francoiscampbell.apimodel.Movie;
+import io.github.francoiscampbell.apimodel.Showtime;
+import io.github.francoiscampbell.apimodel.Theatre;
+import io.github.francoiscampbell.collections.SelfMap;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by francois on 15-07-19.

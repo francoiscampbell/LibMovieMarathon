@@ -1,13 +1,22 @@
 package io.github.francoiscampbell;
 
-import io.github.francoiscampbell.api.*;
-import io.github.francoiscampbell.apimodel.*;
-import io.github.francoiscampbell.model.*;
-import org.joda.time.*;
+import io.github.francoiscampbell.api.ApiKey;
+import io.github.francoiscampbell.api.ApiRequest;
+import io.github.francoiscampbell.apimodel.Movie;
+import io.github.francoiscampbell.apimodel.Showtime;
+import io.github.francoiscampbell.model.Schedule;
+import io.github.francoiscampbell.model.ScheduleGenerator;
+import org.joda.time.Duration;
+import org.joda.time.LocalDate;
 
 import java.awt.*;
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Main
@@ -48,15 +57,16 @@ public class Main {
 
     private ScheduleGenerator.Builder getScheduleGenerator() {
         String currentDate = LocalDate.now().toString();
-        OnConnectApiRequest request = new OnConnectApiRequest.Builder(currentDate)
+        ApiRequest request = new ApiRequest.Builder(currentDate)
                 .apiKey(ApiKey.API_KEY)
                 .postcode("M5T 1N5")
-                .radiusUnit(OnConnectApiRequest.RadiusUnit.KM)
+                .radiusUnit(ApiRequest.RadiusUnit.KM)
 //                .logLevel(RestAdapter.LogLevel.FULL)
-//                .mockResponse(new File("mockResponse.json"))
+                .mockResponse(new File("mockResponse.json"))
                 .build();
-
-        return request.execute();
+        List<Movie> movies = new LinkedList<>();
+        request.execute().toBlocking().forEach(movies::add);
+        return new ScheduleGenerator.Builder(movies);
     }
 
 

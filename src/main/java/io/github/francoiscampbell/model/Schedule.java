@@ -1,9 +1,16 @@
 package io.github.francoiscampbell.model;
 
-import io.github.francoiscampbell.apimodel.*;
-import org.joda.time.*;
+import io.github.francoiscampbell.apimodel.Showtime;
+import io.github.francoiscampbell.apimodel.Theatre;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Created by francois on 15-07-04.

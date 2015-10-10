@@ -1,11 +1,11 @@
 
 package io.github.francoiscampbell.apimodel;
 
-import com.google.gson.annotations.*;
-import org.jetbrains.annotations.*;
-import org.joda.time.*;
+import com.google.gson.annotations.Expose;
+import org.jetbrains.annotations.NotNull;
+import org.joda.time.DateTime;
 
-import javax.annotation.*;
+import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
 public class Showtime implements Comparable<Showtime> {

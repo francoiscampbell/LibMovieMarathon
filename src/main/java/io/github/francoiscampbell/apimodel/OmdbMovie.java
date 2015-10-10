@@ -1,8 +1,9 @@
 package io.github.francoiscampbell.apimodel;
 
-import com.google.gson.annotations.*;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-import javax.annotation.*;
+import javax.annotation.Generated;
 
 @Generated("org.jsonschema2pojo")
 public class OmdbMovie {
