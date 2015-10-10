@@ -1,14 +1,22 @@
 package io.github.francoiscampbell;
 
-import io.github.francoiscampbell.api.*;
-import io.github.francoiscampbell.apimodel.*;
-import io.github.francoiscampbell.model.*;
-import org.joda.time.*;
-import retrofit.*;
+import io.github.francoiscampbell.api.ApiKey;
+import io.github.francoiscampbell.api.ApiRequest;
+import io.github.francoiscampbell.apimodel.Movie;
+import io.github.francoiscampbell.apimodel.Showtime;
+import io.github.francoiscampbell.model.Schedule;
+import io.github.francoiscampbell.model.ScheduleGenerator;
+import org.joda.time.Duration;
+import org.joda.time.LocalDate;
+import retrofit.RestAdapter;
+import rx.Observable;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Main
@@ -24,8 +32,10 @@ public class Main {
     }
 
     public void start() {
-        List<Movie> allMovies = getMovies();
-        mainLoop(allMovies);
+        getMovies()
+                .toList()
+                .doOnNext(this::mainLoop)
+                .subscribe();
     }
 
     private void mainLoop(List<Movie> allMovies) {
@@ -72,27 +82,23 @@ public class Main {
                                      .startsWith("q");
     }
 
-    private List<Movie> getMovies() {
+    private Observable<Movie> getMovies() {
         String currentDate = LocalDate.now().toString();
-        OnConnectApiRequest request = new OnConnectApiRequest.Builder(currentDate)
+        ApiRequest request = new ApiRequest.Builder(currentDate)
                 .apiKey(ApiKey.API_KEY)
                 .postcode("M5T1N5")
-//                .radiusUnit(OnConnectApiRequest.RadiusUnit.KM)
+//                .radiusUnit(ApiRequest.RadiusUnit.KM)
                 .logLevel(RestAdapter.LogLevel.FULL)
                 .mockResponse(mockResponse)
                 .build();
 
-        List<Movie> allMovies = request.execute();
-        removeUnplannableMovies(allMovies);
+        Observable<Movie> allMovies = request.execute();
+        allMovies = removeUnplannableMovies(allMovies);
         return allMovies;
     }
 
-    private void removeUnplannableMovies(List<Movie> allMovies) {
-        for (Iterator<Movie> iterator = allMovies.iterator(); iterator.hasNext(); ) {
-            if (iterator.next().getRunTime() == null) {
-                iterator.remove();
-            }
-        }
+    private Observable<Movie> removeUnplannableMovies(Observable<Movie> allMovies) {
+        return allMovies.filter(m -> m.getRunTime() != null);
     }
 
     private List<Movie> selectMovies(List<Movie> movies) {

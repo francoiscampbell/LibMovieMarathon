@@ -1,54 +1,54 @@
 package io.github.francoiscampbell.api;
 
-import com.google.gson.*;
-import io.github.francoiscampbell.apimodel.*;
-import io.github.francoiscampbell.gson.*;
-import org.joda.time.*;
-import retrofit.*;
-import retrofit.client.*;
-import retrofit.converter.*;
-import retrofit.mime.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.github.francoiscampbell.apimodel.Movie;
+import io.github.francoiscampbell.gson.DateTimeConverter;
+import io.github.francoiscampbell.gson.DurationConverter;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import retrofit.RestAdapter;
+import retrofit.client.Client;
+import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
+import retrofit.mime.TypedByteArray;
 import rx.Observable;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by francois on 15-07-10.
  */
-public class OnConnectApiRequest {
+public class ApiRequest {
 
     private MovieApi movieApi;
     private OmdbApi omdbApi;
     private Map<String, String> queryParams;
 
-    public List<Movie> execute() {
-        List<Movie> movies = new LinkedList<>();
-        final Movie[] currentMovie = new Movie[1];
-        movieApi.getMovies(queryParams).flatMap(Observable::from)
-                .doOnNext(m -> currentMovie[0] = m)
-                .doOnNext(movies::add)
-                .flatMap(m -> omdbApi.getMovieInfo(m.getTitle()))
-                .doOnNext(m -> currentMovie[0].getPreferredImage().setUri(m.getPoster()))
-                .toBlocking()
-                .forEach(m -> System.out.println(currentMovie[0].getPreferredImage().getUri()));
-        return movies;
-    }
-
-    public void execute(Callback<List<Movie>> callback) {
-        movieApi.getMovies(queryParams, callback);
+    public Observable<Movie> execute() {
+        return movieApi.getMovies(queryParams)
+                       .flatMap(Observable::from)
+                       .flatMap(m -> omdbApi.getMovieInfo(m.getTitle())
+                                            .map(omdbMovie -> {
+                                                m.getPreferredImage().setUri(omdbMovie.getPoster());
+                                                return m;
+                                            })
+                       );
     }
 
     public static class Builder {
         private static final String ONCONNECT_API_URL = "http://data.tmsapi.com";
         private static final String OMDB_API_URL = "http://www.omdbapi.com";
 
-        private OnConnectApiRequest request;
+        private ApiRequest request;
         private RestAdapter.Builder onConnectApiBuilder;
         private RestAdapter.Builder omdbApiBuilder;
 
 
         public Builder(String startDate) {
-            request = new OnConnectApiRequest();
+            request = new ApiRequest();
 
             request.queryParams = new HashMap<>();
             request.queryParams.put("startDate", startDate);
@@ -110,13 +110,14 @@ public class OnConnectApiRequest {
 
         public Builder mockResponse(String mockResponse) {
             Client mockClient = request -> new Response(request
-                    .getUrl(), 200, "nothing", Collections.EMPTY_LIST, new TypedByteArray("application/json", mockResponse
+                    .getUrl(), 200, "nothing", Collections
+                    .emptyList(), new TypedByteArray("application/json", mockResponse
                     .getBytes()));
             onConnectApiBuilder.setClient(mockClient);
             return this;
         }
 
-        public OnConnectApiRequest build() {
+        public ApiRequest build() {
             request.movieApi = onConnectApiBuilder.build().create(MovieApi.class);
             request.omdbApi = omdbApiBuilder.build().create(OmdbApi.class);
             return request;
