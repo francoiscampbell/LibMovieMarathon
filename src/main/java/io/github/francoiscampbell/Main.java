@@ -20,7 +20,7 @@ public class Main {
     }
 
     public void start() {
-        ScheduleGenerator.Builder builder = getScheduleGenarator();
+        ScheduleGenerator.Builder builder = getScheduleGenerator();
         mainLoop(builder);
     }
 
@@ -46,7 +46,7 @@ public class Main {
                                      .startsWith("q");
     }
 
-    private ScheduleGenerator.Builder getScheduleGenarator() {
+    private ScheduleGenerator.Builder getScheduleGenerator() {
         String currentDate = LocalDate.now().toString();
         OnConnectApiRequest request = new OnConnectApiRequest.Builder(currentDate)
                 .apiKey(ApiKey.API_KEY)
