@@ -92,20 +92,18 @@ public class ScheduleGenerator {
                 || Collections.max(schedule.getDelays().values()).isShorterThan(maxIndividualDelay));
     }
 
-    private Showtime findNextShowtimeForMovie(Theatre theatre, Movie movie, DateTime startTime) {
+    private Showtime findNextShowtimeForMovie(Theatre theatre, Movie movie, DateTime nextAvailableStartTime) {
         for (Showtime showtime : theatre.getShowtimes()) {
             if (showtime.getMovie().equals(movie)
-                    && validateShowtime(showtime, startTime)) {
+                    && validateShowtime(showtime, nextAvailableStartTime)) {
                 return showtime;
             }
         }
         return null;
     }
 
-    private boolean validateShowtime(Showtime showtime, DateTime startTime) {
-        return showtime.getStartDateTime()
-                       .plus(includePreviewsInRunningTime ? previewsLength : null)
-                       .isAfter(startTime.minus(maxOverlap))
+    private boolean validateShowtime(Showtime showtime, DateTime nextAvailableStartTime) {
+        return showtime.getStartDateTime().isAfter(nextAvailableStartTime.minus(maxOverlap))
                 && (latestTime == null || showtime.getEndDateTime().isBefore(latestTime));
     }
 
