@@ -21,14 +21,14 @@ public class Schedule {
     private Map<Showtime, Duration> delays;
     private Duration totalDelay;
 
-    public Schedule(Deque<Showtime> showtimes, Theatre theatre, boolean includePreviewsLength) {
+    public Schedule(Deque<Showtime> showtimes, Theatre theatre) {
         this.showtimes = new LinkedList<>(showtimes);
         this.theatre = theatre;
-        this.delays = calculateDelays(showtimes, includePreviewsLength);
+        this.delays = calculateDelays(showtimes);
         this.totalDelay = calculateTotalDelay();
     }
 
-    private Map<Showtime, Duration> calculateDelays(Deque<Showtime> showtimes, boolean includePreviewsLength) {
+    private Map<Showtime, Duration> calculateDelays(Deque<Showtime> showtimes) {
         if (showtimes.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -39,7 +39,7 @@ public class Schedule {
             Showtime current = next;
             next = iterator.next();
             DateTime endTime = current.getEndDateTime();
-            DateTime nextStartTime = next.getStartDateTime(includePreviewsLength);
+            DateTime nextStartTime = next.getStartDateTime();
             delays.put(current, new Duration(endTime, nextStartTime));
         }
         return delays;

@@ -56,8 +56,6 @@ public class Movie {
     @Expose
     private List<Showtime> showtimes = new ArrayList<>();
 
-    private Duration previewsLength = Duration.standardMinutes(15); //hardcoded previews length to 15
-
     /**
      * @return The tmsId
      */
@@ -455,17 +453,6 @@ public class Movie {
     public Movie withShowtimes(List<Showtime> showtimes) {
         this.showtimes = showtimes;
         return this;
-    }
-
-    public Duration getPreviewsLength() {
-        return previewsLength;
-    }
-
-    public Duration getTotalLength(boolean includePreviewsLength) {
-        if (includePreviewsLength) {
-            return getRunTime().plus(getPreviewsLength());
-        }
-        return getRunTime();
     }
 
     @Override

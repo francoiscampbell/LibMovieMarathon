@@ -63,8 +63,7 @@ public class ApiRequest {
         private RestAdapter.Builder onConnectApiBuilder;
         private RestAdapter.Builder omdbApiBuilder;
 
-
-        public Builder(String startDate) {
+        private Builder(String startDate) {
             request = new ApiRequest();
 
             request.queryParams = new HashMap<>();
@@ -81,7 +80,14 @@ public class ApiRequest {
             omdbApiBuilder = new RestAdapter.Builder()
 //                    .setLogLevel(RestAdapter.LogLevel.FULL)
                     .setEndpoint(OMDB_API_URL);
+        }
 
+        public static Builder withPostcode(String startDate, String postcode) {
+            return new Builder(startDate).postcode(postcode);
+        }
+
+        public static Builder withLatLng(String startDate, float lat, float lng) {
+            return new Builder(startDate).latlng(lat, lng);
         }
 
         public Builder apiKey(String apiKey) {
@@ -94,9 +100,9 @@ public class ApiRequest {
             return this;
         }
 
-        public Builder latlng(float lat, float lon) {
+        public Builder latlng(float lat, float lng) {
             request.queryParams.put("lat", String.valueOf(lat));
-            request.queryParams.put("lng", String.valueOf(lon));
+            request.queryParams.put("lng", String.valueOf(lng));
             return this;
         }
 
@@ -128,7 +134,7 @@ public class ApiRequest {
         public Builder mockResponse(String mockResponse) {
             Client mockClient = request -> new Response(request
                     .getUrl(), 200, "nothing", Collections
-                    .emptyList(), 
+                    .emptyList(),
                     new TypedByteArray("application/json", mockResponse.getBytes()));
             onConnectApiBuilder.setClient(mockClient);
             return this;

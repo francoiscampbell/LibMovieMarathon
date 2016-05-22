@@ -45,7 +45,7 @@ public class Main {
 
     private void chooseParameters(ScheduleGenerator.Builder builder) {
         builder.sortByDelay(true)
-               .ignorePreviews(false)
+               .includePreviewsInRunningTime(false)
                .maxOverlap(Duration.standardMinutes(0));
     }
 
@@ -57,13 +57,12 @@ public class Main {
 
     private ScheduleGenerator.Builder getScheduleGenerator() {
         String currentDate = LocalDate.now().toString();
-        ApiRequest request = new ApiRequest.Builder(currentDate)
-                .apiKey(ApiKey.API_KEY)
-                .postcode("M5T 1N5")
-                .radiusUnit(ApiRequest.RadiusUnit.KM)
+        ApiRequest request = ApiRequest.Builder.withPostcode(currentDate, "M5R 2W8")
+                                               .apiKey(ApiKey.API_KEY)
+                                               .radiusUnit(ApiRequest.RadiusUnit.KM)
 //                .logLevel(RestAdapter.LogLevel.FULL)
-                .mockResponse(new File("mockResponse.json"))
-                .build();
+                                               .mockResponse(new File("mockResponse.json"))
+                                               .build();
         List<Movie> movies = new LinkedList<>();
         request.execute().toBlocking().forEach(movies::add);
         return new ScheduleGenerator.Builder(movies);
@@ -113,7 +112,7 @@ public class Main {
             difference = maxDelay.minus(minDelay);
 
             for (Showtime showtime : schedule.getShowtimes()) {
-                System.out.println("\t" + showtime.toFriendlyString(false));
+                System.out.println("\t" + showtime.toFriendlyString());
                 Duration delay = schedule.getDelayAfterShowtime(showtime);
                 if (delay != null) {
                     float ratio = MoreMath.protectedDivide(delay.minus(minDelay)

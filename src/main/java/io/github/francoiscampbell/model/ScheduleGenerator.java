@@ -23,7 +23,8 @@ public class ScheduleGenerator {
     private List<Theatre> allTheatres;
 
     private boolean sortByDelay;
-    private boolean ignorePreviews;
+    private boolean includePreviewsInRunningTime;
+    private Duration previewsLength;
     private DateTime earliestTime;
     private DateTime latestTime;
     private Duration maxIndividualDelay;
@@ -61,7 +62,7 @@ public class ScheduleGenerator {
     private void generateSchedule(Theatre theatre, List<Movie> movies, DateTime startTime, List<Schedule> possibleSchedules, Deque<Showtime> currentPermutation) {
         if (movies.size() == 0 && !currentPermutation.isEmpty()) {
             //end condition for recursive algorithm. check for empty to avoid generating a schedule if the list of desired movies is empty at the start
-            Schedule currentSchedule = new Schedule(currentPermutation, theatre, ignorePreviews);
+            Schedule currentSchedule = new Schedule(currentPermutation, theatre);
             if (validateSchedule(currentSchedule)) {
                 possibleSchedules.add(currentSchedule);
             }
@@ -74,7 +75,8 @@ public class ScheduleGenerator {
                 currentPermutation.add(showtime);
                 List<Movie> remainingMovies = new ArrayList<>(movies);
                 remainingMovies.remove(movie);
-                nextAvailableStartTime = showtime.getStartDateTime(ignorePreviews)
+                nextAvailableStartTime = showtime.getStartDateTime()
+                                                 .plus(includePreviewsInRunningTime ? previewsLength : null)
                                                  .plus(movie.getRunTime());
                 generateSchedule(theatre, remainingMovies, nextAvailableStartTime, possibleSchedules, currentPermutation);
                 currentPermutation.removeLast();
@@ -101,9 +103,10 @@ public class ScheduleGenerator {
     }
 
     private boolean validateShowtime(Showtime showtime, DateTime startTime) {
-        return showtime.getStartDateTime(ignorePreviews).isAfter(startTime.minus(maxOverlap))
-                && (latestTime == null
-                || showtime.getEndDateTime().isBefore(latestTime));
+        return showtime.getStartDateTime()
+                       .plus(includePreviewsInRunningTime ? previewsLength : null)
+                       .isAfter(startTime.minus(maxOverlap))
+                && (latestTime == null || showtime.getEndDateTime().isBefore(latestTime));
     }
 
     public static class Builder {
@@ -122,8 +125,13 @@ public class ScheduleGenerator {
             return this;
         }
 
-        public Builder ignorePreviews(boolean ignorePreviews) {
-            scheduleGenerator.ignorePreviews = ignorePreviews;
+        public Builder includePreviewsInRunningTime(boolean includePreviewsInRunningTime) {
+            scheduleGenerator.includePreviewsInRunningTime = includePreviewsInRunningTime;
+            return this;
+        }
+
+        public Builder previewsLength(Duration previewsLength) {
+            scheduleGenerator.previewsLength = previewsLength;
             return this;
         }
 
@@ -160,8 +168,8 @@ public class ScheduleGenerator {
         }
 
         /**
-         * Reorganizes the response from the Gracenote API from a movies->theatres->showtimes
-         * to theatres->showtimes->movies format
+         * Reorganizes the response from the Gracenote API from a movies->theatres->showtimes to
+         * theatres->showtimes->movies format
          *
          * @param movies The list of movies to choose from
          */
